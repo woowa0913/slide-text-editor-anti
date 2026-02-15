@@ -9,8 +9,8 @@ if (!apiKey) {
 
 const ai = new GoogleGenAI({ apiKey: apiKey || '' });
 
-// Image generation model - must support responseModalities: IMAGE
-const IMAGE_GEN_MODEL = 'gemini-2.5-flash-preview-04-17';
+// Image generation model - verified available via ListModels API
+const IMAGE_GEN_MODEL = 'gemini-2.5-flash-image';
 const TEXT_MODEL = 'gemini-2.0-flash';
 
 // Helper: Resize and compress image for API to avoid payload limits
