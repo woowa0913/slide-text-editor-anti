@@ -1,8 +1,13 @@
 
-import { GoogleGenAI, Type } from "@google/genai";
+import { GoogleGenAI, Type, Modality } from "@google/genai";
 import { OCRResult } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+const apiKey = process.env.API_KEY;
+if (!apiKey || apiKey === 'your_google_genai_api_key_here') {
+  console.error("[Gemini] ⚠️ API_KEY가 설정되지 않았거나 기본값입니다. .env 파일 또는 Vercel 환경변수를 확인하세요.");
+}
+
+const ai = new GoogleGenAI({ apiKey: apiKey || '' });
 
 // Helper: Resize and compress image for API to avoid payload limits
 const prepareImageForAPI = async (base64Str: string): Promise<{ data: string, mimeType: string, width: number, height: number }> => {
@@ -142,6 +147,8 @@ export const removeTextFromImage = async (base64Image: string): Promise<string |
     const mimeType = base64Image.match(/data:([a-zA-Z0-9]+\/[a-zA-Z0-9-.+]+).*,.*/)?.[1] || 'image/png';
     const data = base64Image.split(',')[1];
 
+    console.log("[Gemini] removeTextFromImage: sending request...");
+
     const response = await ai.models.generateContent({
       model: 'gemini-2.0-flash-exp',
       contents: {
@@ -157,13 +164,26 @@ export const removeTextFromImage = async (base64Image: string): Promise<string |
           },
         ],
       },
+      config: {
+        responseModalities: [Modality.IMAGE, Modality.TEXT],
+      },
     });
+
+    console.log("[Gemini] removeTextFromImage: response received");
 
     for (const part of response.candidates?.[0]?.content?.parts || []) {
       if (part.inlineData) {
-        return `data:image/png;base64,${part.inlineData.data}`;
+        const responseMime = part.inlineData.mimeType || 'image/png';
+        return `data:${responseMime};base64,${part.inlineData.data}`;
       }
     }
+
+    // Log text response if any
+    const textOutput = response.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (textOutput) {
+      console.warn("[Gemini] Model returned text instead of image:", textOutput);
+    }
+
     return null;
   } catch (error) {
     console.error("AI Inpainting failed", error);
@@ -175,10 +195,6 @@ export const removeAllTextFromSlide = async (base64Image: string): Promise<strin
   try {
     // 1. Resize and Compress Image for API
     const { data, mimeType, width, height } = await prepareImageForAPI(base64Image);
-
-    // NOTE: For purely editing/inpainting tasks where we want the output to match input size,
-    // we should NOT constrain the aspect ratio in config, or the model might try to regenerate
-    // the image composition instead of editing it.
 
     console.log(`[Gemini] Sending image for text removal: ${width}x${height}`);
 
@@ -197,14 +213,17 @@ export const removeAllTextFromSlide = async (base64Image: string): Promise<strin
           },
         ],
       },
-      // Removed config.imageConfig to allow model to default to input image aspect ratio/size for editing
+      config: {
+        responseModalities: [Modality.IMAGE, Modality.TEXT],
+      },
     });
 
-    console.log("[Gemini] Response received", response);
+    console.log("[Gemini] Response received");
 
     for (const part of response.candidates?.[0]?.content?.parts || []) {
       if (part.inlineData) {
-        return `data:image/png;base64,${part.inlineData.data}`;
+        const responseMime = part.inlineData.mimeType || 'image/png';
+        return `data:${responseMime};base64,${part.inlineData.data}`;
       }
     }
 

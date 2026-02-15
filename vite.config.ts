@@ -11,7 +11,9 @@ export default defineConfig(({ mode }) => {
       outDir: 'dist',
     },
     define: {
-      'process.env.API_KEY': JSON.stringify(env.API_KEY),
+      // loadEnv reads from .env files (local dev)
+      // process.env reads from system env vars (Vercel deployment)
+      'process.env.API_KEY': JSON.stringify(env.API_KEY || process.env.API_KEY),
     },
   };
 });
