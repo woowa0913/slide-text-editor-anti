@@ -7,15 +7,14 @@ import { convertPdfToImages, downloadAsPdf } from './services/pdfService';
 import { removeAllTextFromSlide } from './services/geminiService';
 import EditorCanvas from './components/EditorCanvas';
 import Sidebar from './components/Sidebar';
-import { 
-  FileUp, 
-  Download, 
-  FileText, 
-  ChevronLeft, 
-  ChevronRight, 
-  Trash2, 
-  Undo2, 
-  Redo2, 
+import SlidePanel from './components/SlidePanel';
+import {
+  FileUp,
+  Download,
+  FileText,
+  Trash2,
+  Undo2,
+  Redo2,
   Image as ImageIcon,
   Plus,
   Eraser
@@ -30,7 +29,8 @@ const App: React.FC = () => {
   const [selection, setSelection] = useState<Rect | null>(null);
   const [selectedOverlayId, setSelectedOverlayId] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
-  
+  const [slidePanelCollapsed, setSlidePanelCollapsed] = useState(false);
+
   // Draft overlay state for preview (lifted from Sidebar)
   const [draftOverlay, setDraftOverlay] = useState<Partial<TextOverlay> | null>(null);
 
@@ -72,7 +72,7 @@ const App: React.FC = () => {
           reader.readAsDataURL(file);
         });
       }
-      
+
       // Initialize History
       setHistory([newSlides]);
       setHistoryIndex(0);
@@ -96,29 +96,29 @@ const App: React.FC = () => {
         const imageSrc = ev.target?.result as string;
         const img = new Image();
         img.onload = () => {
-           // Default to center of the slide
-           const slide = currentSlides[activeSlideIdx];
-           const width = 200; // Default width
-           const height = (img.height / img.width) * width;
-           const x = (slide.width - width) / 2;
-           const y = (slide.height - height) / 2;
+          // Default to center of the slide
+          const slide = currentSlides[activeSlideIdx];
+          const width = 200; // Default width
+          const height = (img.height / img.width) * width;
+          const x = (slide.width - width) / 2;
+          const y = (slide.height - height) / 2;
 
-           const newOverlay: TextOverlay = {
-              id: Math.random().toString(36).substr(2, 9),
-              type: 'image',
-              rect: { x, y, width, height },
-              imageSrc: imageSrc,
-              originalText: '',
-              newText: '',
-              fontSize: 0,
-              fontWeight: 'normal',
-              fontColor: 'transparent',
-              fontFamily: 'sans-serif',
-              backgroundColor: 'transparent',
-              vAlign: 'top',
-              hAlign: 'left'
-           };
-           handleApplyOverlay(newOverlay);
+          const newOverlay: TextOverlay = {
+            id: Math.random().toString(36).substr(2, 9),
+            type: 'image',
+            rect: { x, y, width, height },
+            imageSrc: imageSrc,
+            originalText: '',
+            newText: '',
+            fontSize: 0,
+            fontWeight: 'normal',
+            fontColor: 'transparent',
+            fontFamily: 'sans-serif',
+            backgroundColor: 'transparent',
+            vAlign: 'top',
+            hAlign: 'left'
+          };
+          handleApplyOverlay(newOverlay);
         };
         img.src = imageSrc;
       };
@@ -130,11 +130,11 @@ const App: React.FC = () => {
   };
 
   const handleApplyOverlay = (overlay: TextOverlay, keepSelection: boolean = false) => {
-    const newSlides = currentSlides.map((s, idx) => 
+    const newSlides = currentSlides.map((s, idx) =>
       idx === activeSlideIdx ? { ...s, overlays: [...s.overlays, overlay] } : s
     );
     updateHistory(newSlides);
-    
+
     if (keepSelection) {
       // Keep selection and just clear editing state (though new overlay is created)
       setSelectedOverlayId(null);
@@ -145,7 +145,7 @@ const App: React.FC = () => {
   };
 
   const handleUpdateOverlays = (overlays: TextOverlay[]) => {
-    const newSlides = currentSlides.map((s, idx) => 
+    const newSlides = currentSlides.map((s, idx) =>
       idx === activeSlideIdx ? { ...s, overlays } : s
     );
     updateHistory(newSlides);
@@ -166,8 +166,8 @@ const App: React.FC = () => {
   }, [historyIndex, history.length]);
 
   const handleDeleteAll = () => {
-    const newSlides = currentSlides.map((s, idx) => 
-      idx === activeSlideIdx ? {...s, overlays: []} : s
+    const newSlides = currentSlides.map((s, idx) =>
+      idx === activeSlideIdx ? { ...s, overlays: [] } : s
     );
     updateHistory(newSlides);
     setSelectedOverlayId(null);
@@ -192,17 +192,17 @@ const App: React.FC = () => {
   const handleDownloadImages = async () => {
     if (currentSlides.length === 0) return;
     setIsProcessing(true);
-    
+
     try {
       const zip = new JSZip();
-      
+
       for (let i = 0; i < currentSlides.length; i++) {
         const slide = currentSlides[i];
         const canvas = document.createElement('canvas');
         canvas.width = slide.width;
         canvas.height = slide.height;
         const ctx = canvas.getContext('2d')!;
-        
+
         // 1. Draw Original Image
         const img = new Image();
         img.src = slide.dataUrl;
@@ -211,38 +211,38 @@ const App: React.FC = () => {
           img.onerror = resolve;
         });
         ctx.drawImage(img, 0, 0);
-        
+
         // 2. Draw Overlays
         for (const ov of slide.overlays) {
           if (ov.type === 'image' && ov.imageSrc) {
-             const uImg = new Image();
-             uImg.src = ov.imageSrc;
-             await new Promise((resolve) => {
-                uImg.onload = resolve;
-                uImg.onerror = resolve;
-             });
-             ctx.drawImage(uImg, ov.rect.x, ov.rect.y, ov.rect.width, ov.rect.height);
+            const uImg = new Image();
+            uImg.src = ov.imageSrc;
+            await new Promise((resolve) => {
+              uImg.onload = resolve;
+              uImg.onerror = resolve;
+            });
+            ctx.drawImage(uImg, ov.rect.x, ov.rect.y, ov.rect.width, ov.rect.height);
           } else {
             // Background (Color or AI Image)
             if (ov.backgroundImage) {
-                const bgImg = new Image();
-                bgImg.src = ov.backgroundImage;
-                await new Promise((resolve) => {
+              const bgImg = new Image();
+              bgImg.src = ov.backgroundImage;
+              await new Promise((resolve) => {
                 bgImg.onload = resolve;
                 bgImg.onerror = resolve;
-                });
-                ctx.drawImage(bgImg, ov.rect.x, ov.rect.y, ov.rect.width, ov.rect.height);
+              });
+              ctx.drawImage(bgImg, ov.rect.x, ov.rect.y, ov.rect.width, ov.rect.height);
             } else {
-                ctx.fillStyle = ov.backgroundColor;
-                ctx.fillRect(ov.rect.x, ov.rect.y, ov.rect.width, ov.rect.height);
+              ctx.fillStyle = ov.backgroundColor;
+              ctx.fillRect(ov.rect.x, ov.rect.y, ov.rect.width, ov.rect.height);
             }
-            
+
             // Text
             ctx.fillStyle = ov.fontColor;
             ctx.font = `${ov.fontWeight} ${ov.fontSize}px ${ov.fontFamily}, sans-serif`;
-            
+
             if (ctx.letterSpacing !== undefined) {
-                ctx.letterSpacing = `${ov.letterSpacing || 0}px`;
+              ctx.letterSpacing = `${ov.letterSpacing || 0}px`;
             }
 
             const lines = ov.newText.split('\n');
@@ -261,11 +261,11 @@ const App: React.FC = () => {
             else if (ov.vAlign === 'bottom') ty = ov.rect.y + ov.rect.height - totalTextHeight;
 
             lines.forEach((line, index) => {
-                ctx.fillText(line, tx, ty + index * lineHeight);
+              ctx.fillText(line, tx, ty + index * lineHeight);
             });
-            
+
             if (ctx.letterSpacing !== undefined) {
-                ctx.letterSpacing = '0px';
+              ctx.letterSpacing = '0px';
             }
           }
         }
@@ -278,7 +278,7 @@ const App: React.FC = () => {
 
       const content = await zip.generateAsync({ type: "blob" });
       saveAs(content, "slides_images.zip");
-      
+
     } catch (error) {
       console.error(error);
       alert('이미지 생성 중 오류가 발생했습니다.');
@@ -292,6 +292,34 @@ const App: React.FC = () => {
     downloadAsPdf(currentSlides, 'edited_slides.pdf');
   };
 
+  const handleSlideDelete = (index: number) => {
+    if (currentSlides.length <= 1) return;
+    const newSlides = currentSlides.filter((_, i) => i !== index);
+    updateHistory(newSlides);
+    if (activeSlideIdx >= newSlides.length) {
+      setActiveSlideIdx(newSlides.length - 1);
+    } else if (activeSlideIdx > index) {
+      setActiveSlideIdx(activeSlideIdx - 1);
+    }
+    setSelection(null);
+    setSelectedOverlayId(null);
+  };
+
+  const handleSlideReorder = (fromIndex: number, toIndex: number) => {
+    const newSlides = [...currentSlides];
+    const [moved] = newSlides.splice(fromIndex, 1);
+    newSlides.splice(toIndex, 0, moved);
+    updateHistory(newSlides);
+    // Update active index to follow the active slide
+    if (activeSlideIdx === fromIndex) {
+      setActiveSlideIdx(toIndex);
+    } else if (activeSlideIdx > fromIndex && activeSlideIdx <= toIndex) {
+      setActiveSlideIdx(activeSlideIdx - 1);
+    } else if (activeSlideIdx < fromIndex && activeSlideIdx >= toIndex) {
+      setActiveSlideIdx(activeSlideIdx + 1);
+    }
+  };
+
   const handleRemoveText = async () => {
     if (currentSlides.length === 0) return;
     if (!window.confirm("현재 슬라이드의 모든 텍스트를 제거하고 배경을 복원하시겠습니까?\n이 작업은 약 5~10초 정도 소요됩니다.")) return;
@@ -299,24 +327,22 @@ const App: React.FC = () => {
     setIsProcessing(true);
     try {
       const currentSlide = currentSlides[activeSlideIdx];
-      // Note: Passing the original high-res image. geminiService will handle resizing.
       const cleanImage = await removeAllTextFromSlide(currentSlide.dataUrl);
 
       if (cleanImage) {
-        // Create new slides array with updated dataUrl for the active slide
-        const newSlides = currentSlides.map((s, idx) => 
+        const newSlides = currentSlides.map((s, idx) =>
           idx === activeSlideIdx ? { ...s, dataUrl: cleanImage, overlays: [] } : s
         );
         updateHistory(newSlides);
-        // Also clear any current selections since the underlying image changed
         setSelection(null);
         setSelectedOverlayId(null);
       } else {
-        alert("텍스트 제거에 실패했습니다.\n\n가능한 원인:\n1. 이미지에 제거할 텍스트가 명확하지 않음\n2. AI 모델 일시적 오류\n3. 안전 필터(Safety Filter) 작동");
+        alert("텍스트 제거에 실패했습니다. AI 모델 응답이 비어있습니다.");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      alert("오류가 발생했습니다. 콘솔을 확인해주세요.");
+      const errorMsg = error?.message || error?.toString() || '알 수 없는 오류';
+      alert(`텍스트 제거에 실패했습니다.\n\n오류 상세: ${errorMsg}`);
     } finally {
       setIsProcessing(false);
     }
@@ -337,10 +363,10 @@ const App: React.FC = () => {
           </div>
 
           {/* 2. KT Cloud Logo (White) */}
-          <img 
-             src="https://lh3.googleusercontent.com/d/1cg9YBFIuZtsnn_oekcN121ks_JnJPiX-" 
-             alt="KT Cloud Logo" 
-             className="h-3.5 w-auto object-contain opacity-80"
+          <img
+            src="https://lh3.googleusercontent.com/d/1cg9YBFIuZtsnn_oekcN121ks_JnJPiX-"
+            alt="KT Cloud Logo"
+            className="h-3.5 w-auto object-contain opacity-80"
           />
 
           {/* 3. Title */}
@@ -355,17 +381,17 @@ const App: React.FC = () => {
             <Plus size={18} /><span>이미지 추가</span>
             <input type="file" accept="image/*" className="hidden" onChange={handleAddImage} disabled={currentSlides.length === 0} />
           </label>
-          
-          <button 
-             onClick={handleRemoveText} 
-             disabled={currentSlides.length === 0 || isProcessing}
-             className="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 disabled:opacity-50 text-slate-200 rounded-lg text-sm font-medium border border-slate-600 transition-colors"
+
+          <button
+            onClick={handleRemoveText}
+            disabled={currentSlides.length === 0 || isProcessing}
+            className="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 disabled:opacity-50 text-slate-200 rounded-lg text-sm font-medium border border-slate-600 transition-colors"
           >
-             <Eraser size={18} /><span>{isProcessing ? '처리 중...' : '텍스트 제거'}</span>
+            <Eraser size={18} /><span>{isProcessing ? '처리 중...' : '텍스트 제거'}</span>
           </button>
 
           <div className="w-px h-6 bg-slate-700 mx-2"></div>
-          
+
           <button onClick={handleDownloadImages} disabled={currentSlides.length === 0} className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 disabled:opacity-50 text-slate-300 rounded-lg text-sm border border-slate-700 transition-all">
             <Download size={18} /><span>슬라이드 이미지 저장</span>
           </button>
@@ -375,37 +401,50 @@ const App: React.FC = () => {
         </div>
       </header>
       <main className="flex flex-1 overflow-hidden">
-        {/* Left Toolbar / Panel */}
-        <aside className="w-20 border-r border-slate-800 bg-[#1e293b] flex flex-col items-center py-6 gap-6 shrink-0 z-10">
-          <div className="flex flex-col gap-2 w-full px-4">
-             <button 
-               onClick={handleUndo} 
-               disabled={historyIndex <= 0}
-               className="p-3 rounded-xl bg-slate-800 hover:bg-slate-700 disabled:opacity-30 disabled:hover:bg-slate-800 text-slate-300 border border-slate-700 transition-all flex items-center justify-center" 
-               title="실행 취소 (Ctrl+Z)"
-             >
-               <Undo2 size={20} />
-             </button>
-             <button 
-               onClick={handleRedo} 
-               disabled={historyIndex >= history.length - 1}
-               className="p-3 rounded-xl bg-slate-800 hover:bg-slate-700 disabled:opacity-30 disabled:hover:bg-slate-800 text-slate-300 border border-slate-700 transition-all flex items-center justify-center" 
-               title="다시 실행 (Ctrl+Shift+Z)"
-             >
-               <Redo2 size={20} />
-             </button>
+        {/* Left Slide Panel */}
+        {currentSlides.length > 0 && (
+          <SlidePanel
+            slides={currentSlides}
+            activeSlideIdx={activeSlideIdx}
+            onSlideSelect={(idx) => { setActiveSlideIdx(idx); setSelection(null); setSelectedOverlayId(null); }}
+            onSlideDelete={handleSlideDelete}
+            onSlideReorder={handleSlideReorder}
+            isCollapsed={slidePanelCollapsed}
+            onToggleCollapse={() => setSlidePanelCollapsed(prev => !prev)}
+          />
+        )}
+
+        {/* Left Toolbar */}
+        <aside className="w-14 border-r border-slate-800 bg-[#1e293b] flex flex-col items-center py-4 gap-4 shrink-0 z-10">
+          <div className="flex flex-col gap-2 w-full px-2">
+            <button
+              onClick={handleUndo}
+              disabled={historyIndex <= 0}
+              className="p-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 disabled:opacity-30 disabled:hover:bg-slate-800 text-slate-300 border border-slate-700 transition-all flex items-center justify-center"
+              title="실행 취소 (Ctrl+Z)"
+            >
+              <Undo2 size={18} />
+            </button>
+            <button
+              onClick={handleRedo}
+              disabled={historyIndex >= history.length - 1}
+              className="p-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 disabled:opacity-30 disabled:hover:bg-slate-800 text-slate-300 border border-slate-700 transition-all flex items-center justify-center"
+              title="다시 실행 (Ctrl+Shift+Z)"
+            >
+              <Redo2 size={18} />
+            </button>
           </div>
-          <div className="w-8 h-px bg-slate-700 my-2"></div>
-          <button 
-            onClick={handleDeleteAll} 
+          <div className="w-6 h-px bg-slate-700"></div>
+          <button
+            onClick={handleDeleteAll}
             disabled={!currentSlides[activeSlideIdx]?.overlays?.length}
-            className="p-3 rounded-xl hover:bg-red-900/20 hover:text-red-400 disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-slate-400 text-slate-400 transition-colors" 
+            className="p-2.5 rounded-lg hover:bg-red-900/20 hover:text-red-400 disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-slate-400 text-slate-400 transition-colors"
             title="현재 슬라이드 초기화"
           >
-            <Trash2 size={24} />
+            <Trash2 size={20} />
           </button>
         </aside>
-        
+
         <div className="flex-1 flex flex-col bg-slate-950 relative">
           {isProcessing ? (
             <div className="flex-1 flex flex-col items-center justify-center gap-4">
@@ -413,21 +452,14 @@ const App: React.FC = () => {
               <p className="text-slate-400 font-medium">AI가 슬라이드를 분석 및 복원 중입니다...</p>
             </div>
           ) : currentSlides.length > 0 ? (
-            <>
-              <EditorCanvas 
-                slide={currentSlides[activeSlideIdx]} 
-                selectedOverlayId={selectedOverlayId}
-                draftOverlay={draftOverlay}
-                onSelectionChange={(rect) => { setSelection(rect); if (rect) setSelectedOverlayId(null); }} 
-                onOverlaySelect={setSelectedOverlayId}
-                onUpdateOverlays={handleUpdateOverlays} 
-              />
-              <div className="h-12 bg-[#1e293b] border-t border-slate-800 flex items-center justify-center gap-8 shrink-0">
-                <button disabled={activeSlideIdx === 0} onClick={() => setActiveSlideIdx(prev => prev - 1)} className="p-1 hover:bg-slate-700 rounded-full disabled:opacity-20 transition-colors"><ChevronLeft /></button>
-                <span className="text-sm font-black text-white">{activeSlideIdx + 1} / {currentSlides.length}</span>
-                <button disabled={activeSlideIdx === currentSlides.length - 1} onClick={() => setActiveSlideIdx(prev => prev + 1)} className="p-1 hover:bg-slate-700 rounded-full disabled:opacity-20 transition-colors"><ChevronRight /></button>
-              </div>
-            </>
+            <EditorCanvas
+              slide={currentSlides[activeSlideIdx]}
+              selectedOverlayId={selectedOverlayId}
+              draftOverlay={draftOverlay}
+              onSelectionChange={(rect) => { setSelection(rect); if (rect) setSelectedOverlayId(null); }}
+              onOverlaySelect={setSelectedOverlayId}
+              onUpdateOverlays={handleUpdateOverlays}
+            />
           ) : (
             <div className="flex-1 flex flex-col items-center justify-center text-slate-500 p-8 text-center">
               <div className="w-40 h-40 mb-10 bg-slate-900 rounded-[2.5rem] flex items-center justify-center border-2 border-dashed border-slate-800"><ImageIcon size={64} className="opacity-10" /></div>
@@ -440,11 +472,11 @@ const App: React.FC = () => {
             </div>
           )}
         </div>
-        <Sidebar 
-          activeSlide={currentSlides[activeSlideIdx]} 
-          selection={selection} 
+        <Sidebar
+          activeSlide={currentSlides[activeSlideIdx]}
+          selection={selection}
           selectedOverlayId={selectedOverlayId}
-          onApplyOverlay={handleApplyOverlay} 
+          onApplyOverlay={handleApplyOverlay}
           onUpdateOverlays={handleUpdateOverlays}
           onDraftChange={setDraftOverlay}
         />

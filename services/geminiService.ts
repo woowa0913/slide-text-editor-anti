@@ -3,11 +3,15 @@ import { GoogleGenAI, Type, Modality } from "@google/genai";
 import { OCRResult } from "../types";
 
 const apiKey = process.env.API_KEY;
-if (!apiKey || apiKey === 'your_google_genai_api_key_here') {
-  console.error("[Gemini] ⚠️ API_KEY가 설정되지 않았거나 기본값입니다. .env 파일 또는 Vercel 환경변수를 확인하세요.");
+if (!apiKey) {
+  console.error("[Gemini] ⚠️ API_KEY가 설정되지 않았습니다. .env 파일 또는 Vercel 환경변수를 확인하세요.");
 }
 
 const ai = new GoogleGenAI({ apiKey: apiKey || '' });
+
+// Image generation model - try stable model first
+const IMAGE_GEN_MODEL = 'gemini-2.0-flash';
+const TEXT_MODEL = 'gemini-2.0-flash';
 
 // Helper: Resize and compress image for API to avoid payload limits
 const prepareImageForAPI = async (base64Str: string): Promise<{ data: string, mimeType: string, width: number, height: number }> => {
@@ -19,7 +23,6 @@ const prepareImageForAPI = async (base64Str: string): Promise<{ data: string, mi
       let w = img.width;
       let h = img.height;
 
-      // Downscale if too large
       if (w > MAX_DIM || h > MAX_DIM) {
         const scale = Math.min(MAX_DIM / w, MAX_DIM / h);
         w = Math.round(w * scale);
@@ -34,21 +37,19 @@ const prepareImageForAPI = async (base64Str: string): Promise<{ data: string, mi
 
       ctx.drawImage(img, 0, 0, w, h);
 
-      // Export as JPEG (quality 0.85) to reduce size significantly compared to PNG
       const newDataUrl = canvas.toDataURL('image/jpeg', 0.85);
       const mimeType = 'image/jpeg';
       const data = newDataUrl.split(',')[1];
       resolve({ data, mimeType, width: w, height: h });
     };
     img.onerror = (e) => reject(e);
-    // Handle potential data URI prefixes
     img.src = base64Str;
   });
 };
 
 export const analyzeTextInImage = async (base64Image: string): Promise<OCRResult> => {
   const response = await ai.models.generateContent({
-    model: 'gemini-2.0-flash',
+    model: TEXT_MODEL,
     contents: {
       parts: [
         {
@@ -124,7 +125,7 @@ export const analyzeTextInImage = async (base64Image: string): Promise<OCRResult
 export const generateTextSuggestion = async (originalText: string): Promise<string> => {
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash',
+      model: TEXT_MODEL,
       contents: `Context: A user is editing a slide presentation.
       Task: Rewrite the following text to be more professional, concise, or natural.
       If it is a sentence fragment, complete it logically. 
@@ -143,14 +144,13 @@ export const generateTextSuggestion = async (originalText: string): Promise<stri
 
 export const removeTextFromImage = async (base64Image: string): Promise<string | null> => {
   try {
-    // Detect mime type simple check
     const mimeType = base64Image.match(/data:([a-zA-Z0-9]+\/[a-zA-Z0-9-.+]+).*,.*/)?.[1] || 'image/png';
     const data = base64Image.split(',')[1];
 
-    console.log("[Gemini] removeTextFromImage: sending request...");
+    console.log(`[Gemini] removeTextFromImage: sending request with model ${IMAGE_GEN_MODEL}...`);
 
     const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash-exp',
+      model: IMAGE_GEN_MODEL,
       contents: {
         parts: [
           {
@@ -160,7 +160,7 @@ export const removeTextFromImage = async (base64Image: string): Promise<string |
             },
           },
           {
-            text: "High-fidelity Inpainting Task: Remove the text completely from this image slice. The goal is to recover the background behind the text. \n\nCRITICAL REQUIREMENTS:\n1. Seamlessly blend the inpainted area with the surrounding texture, noise, and gradient.\n2. Do NOT leave any blurry artifacts or solid color blocks. It must look photorealistic.\n3. Do not generate new objects. Just restore the clean background.",
+            text: "Remove all text from this image. Fill the text areas with the surrounding background pattern (inpainting). Keep everything else the same. Return only the edited image.",
           },
         ],
       },
@@ -178,28 +178,27 @@ export const removeTextFromImage = async (base64Image: string): Promise<string |
       }
     }
 
-    // Log text response if any
     const textOutput = response.candidates?.[0]?.content?.parts?.[0]?.text;
     if (textOutput) {
       console.warn("[Gemini] Model returned text instead of image:", textOutput);
+      throw new Error(`모델이 이미지 대신 텍스트를 반환했습니다: ${textOutput.substring(0, 100)}`);
     }
 
-    return null;
-  } catch (error) {
-    console.error("AI Inpainting failed", error);
-    return null;
+    throw new Error("모델 응답에 이미지 데이터가 없습니다.");
+  } catch (error: any) {
+    console.error("AI Inpainting failed:", error);
+    throw error; // Re-throw to let caller handle with detailed message
   }
 };
 
 export const removeAllTextFromSlide = async (base64Image: string): Promise<string | null> => {
   try {
-    // 1. Resize and Compress Image for API
     const { data, mimeType, width, height } = await prepareImageForAPI(base64Image);
 
-    console.log(`[Gemini] Sending image for text removal: ${width}x${height}`);
+    console.log(`[Gemini] Sending full slide for text removal: ${width}x${height}, model: ${IMAGE_GEN_MODEL}`);
 
     const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash-exp',
+      model: IMAGE_GEN_MODEL,
       contents: {
         parts: [
           {
@@ -209,7 +208,7 @@ export const removeAllTextFromSlide = async (base64Image: string): Promise<strin
             },
           },
           {
-            text: "Image Editing Task: Remove ALL text from this image. Replace the text areas with the surrounding background pattern (inpainting). Keep all other graphics, charts, and layout elements exactly the same. Do not generate a new design. Just clean the text. Return only the image.",
+            text: "Remove ALL text from this image. Replace the text areas with the surrounding background pattern (inpainting). Keep all other graphics, charts, and layout elements exactly the same. Do not generate a new design. Just clean the text. Return only the image.",
           },
         ],
       },
@@ -227,15 +226,15 @@ export const removeAllTextFromSlide = async (base64Image: string): Promise<strin
       }
     }
 
-    // Fallback: Check for text refusal/error from model
     const textOutput = response.candidates?.[0]?.content?.parts?.[0]?.text;
     if (textOutput) {
       console.warn("[Gemini] Model returned text instead of image:", textOutput);
+      throw new Error(`모델이 이미지 대신 텍스트를 반환했습니다: ${textOutput.substring(0, 100)}`);
     }
 
-    return null;
-  } catch (error) {
-    console.error("Full Slide Text Removal failed", error);
-    return null;
+    throw new Error("모델 응답에 이미지 데이터가 없습니다.");
+  } catch (error: any) {
+    console.error("Full Slide Text Removal failed:", error);
+    throw error; // Re-throw to let caller handle with detailed message
   }
 };

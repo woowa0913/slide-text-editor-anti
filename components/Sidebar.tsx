@@ -355,9 +355,10 @@ const Sidebar: React.FC<SidebarProps> = ({
       } else {
         alert("AI 배경 복원에 실패했습니다.\n\n가능한 원인:\n1. API 키가 올바르지 않음\n2. AI 모델 일시적 오류\n3. 안전 필터(Safety Filter) 작동");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      alert("배경 생성에 실패했습니다.");
+      const errorMsg = error?.message || error?.toString() || '알 수 없는 오류';
+      alert(`AI 배경 복원에 실패했습니다.\n\n오류 상세: ${errorMsg}`);
     } finally {
       setIsGeneratingBg(false);
     }
