@@ -715,9 +715,15 @@ const Sidebar: React.FC<SidebarProps> = ({
                     onChange={(e) => {
                       const checked = e.target.checked;
                       setIsTransparent(checked);
+                      if (checked) {
+                        // Transparency should always win over image/color backgrounds.
+                        setBackgroundImage(undefined);
+                      }
                       if (isEditing) {
-                        // If checking off transparency, just ensure correct alpha, do not delete image
-                        updateSelectedOverlay({ backgroundColor: checked ? 'rgba(0,0,0,0)' : backgroundColor });
+                        updateSelectedOverlay({
+                          backgroundColor: checked ? 'rgba(0,0,0,0)' : backgroundColor,
+                          backgroundImage: checked ? undefined : backgroundImage
+                        });
                       }
                     }}
                     className="w-4 h-4 rounded border-slate-600 bg-slate-800 text-blue-600 focus:ring-0 focus:ring-offset-0 transition-colors group-hover:border-slate-500"

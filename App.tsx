@@ -4,9 +4,11 @@ import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 import { SlideData, Rect, TextOverlay } from './types';
 import { convertPdfToImages, downloadAsPdf } from './services/pdfService';
+import { downloadAsPpt } from './services/pptService';
 import { removeAllTextFromSlide } from './services/geminiService';
-import { loadImage, readFileAsDataUrl } from './services/imageUtils';
+import { readFileAsDataUrl } from './services/imageUtils';
 import { createOverlayId } from './utils/id';
+import { renderSlideToCanvas } from './services/slideRenderService';
 import EditorCanvas from './components/EditorCanvas';
 import Sidebar from './components/Sidebar';
 import SlidePanel from './components/SlidePanel';
@@ -14,6 +16,7 @@ import {
   FileUp,
   Download,
   FileText,
+  Presentation,
   Trash2,
   Undo2,
   Redo2,
@@ -56,7 +59,12 @@ const App: React.FC = () => {
         newSlides = await convertPdfToImages(file);
       } else if (file.type.startsWith('image/')) {
         const imageDataUrl = await readFileAsDataUrl(file);
-        const img = await loadImage(imageDataUrl);
+        const img = new Image();
+        img.src = imageDataUrl;
+        await new Promise((resolve, reject) => {
+          img.onload = resolve;
+          img.onerror = () => reject(new Error("Failed to load uploaded image."));
+        });
         newSlides = [{
           index: 0,
           dataUrl: imageDataUrl,
@@ -85,7 +93,12 @@ const App: React.FC = () => {
 
     try {
       const imageSrc = await readFileAsDataUrl(file);
-      const img = await loadImage(imageSrc);
+      const img = new Image();
+      img.src = imageSrc;
+      await new Promise((resolve, reject) => {
+        img.onload = resolve;
+        img.onerror = () => reject(new Error("Failed to load image for overlay."));
+      });
 
       // Default to center of the slide
       const slide = currentSlides[activeSlideIdx];
@@ -164,9 +177,27 @@ const App: React.FC = () => {
     setSelectedOverlayId(null);
   };
 
+  const handleDeleteSelectedOverlay = useCallback(() => {
+    if (!selectedOverlayId) return;
+    const slide = currentSlides[activeSlideIdx];
+    if (!slide) return;
+
+    const overlays = slide.overlays.filter((overlay) => overlay.id !== selectedOverlayId);
+    const newSlides = currentSlides.map((s, idx) =>
+      idx === activeSlideIdx ? { ...s, overlays } : s
+    );
+    updateHistory(newSlides);
+    setSelectedOverlayId(null);
+    setSelection(null);
+  }, [selectedOverlayId, currentSlides, activeSlideIdx]);
+
   // Keyboard shortcuts for Undo/Redo
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      const isInput = target?.tagName === 'INPUT' || target?.tagName === 'TEXTAREA' || target?.isContentEditable;
+      if (isInput) return;
+
       if ((e.metaKey || e.ctrlKey) && e.key === 'z') {
         if (e.shiftKey) {
           handleRedo();
@@ -174,11 +205,17 @@ const App: React.FC = () => {
           handleUndo();
         }
         e.preventDefault();
+        return;
+      }
+
+      if ((e.key === 'Delete' || e.key === 'Backspace') && selectedOverlayId) {
+        handleDeleteSelectedOverlay();
+        e.preventDefault();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleUndo, handleRedo]);
+  }, [handleUndo, handleRedo, handleDeleteSelectedOverlay, selectedOverlayId]);
 
   const handleDownloadImages = async () => {
     if (currentSlides.length === 0) return;
@@ -189,80 +226,7 @@ const App: React.FC = () => {
 
       for (let i = 0; i < currentSlides.length; i++) {
         const slide = currentSlides[i];
-        const canvas = document.createElement('canvas');
-        canvas.width = slide.width;
-        canvas.height = slide.height;
-        const ctx = canvas.getContext('2d');
-        if (!ctx) {
-          throw new Error('Canvas context initialization failed.');
-        }
-
-        // 1. Draw Original Image
-        const img = new Image();
-        img.src = slide.dataUrl;
-        await new Promise((resolve) => {
-          img.onload = resolve;
-          img.onerror = resolve;
-        });
-        ctx.drawImage(img, 0, 0);
-
-        // 2. Draw Overlays
-        for (const ov of slide.overlays) {
-          if (ov.type === 'image' && ov.imageSrc) {
-            const uImg = new Image();
-            uImg.src = ov.imageSrc;
-            await new Promise((resolve) => {
-              uImg.onload = resolve;
-              uImg.onerror = resolve;
-            });
-            ctx.drawImage(uImg, ov.rect.x, ov.rect.y, ov.rect.width, ov.rect.height);
-          } else {
-            // Background (Color or AI Image)
-            if (ov.backgroundImage) {
-              const bgImg = new Image();
-              bgImg.src = ov.backgroundImage;
-              await new Promise((resolve) => {
-                bgImg.onload = resolve;
-                bgImg.onerror = resolve;
-              });
-              ctx.drawImage(bgImg, ov.rect.x, ov.rect.y, ov.rect.width, ov.rect.height);
-            } else {
-              ctx.fillStyle = ov.backgroundColor;
-              ctx.fillRect(ov.rect.x, ov.rect.y, ov.rect.width, ov.rect.height);
-            }
-
-            // Text
-            ctx.fillStyle = ov.fontColor;
-            ctx.font = `${ov.fontWeight} ${ov.fontSize}px ${ov.fontFamily}, sans-serif`;
-
-            if (ctx.letterSpacing !== undefined) {
-              ctx.letterSpacing = `${ov.letterSpacing || 0}px`;
-            }
-
-            const lines = ov.newText.split('\n');
-            const lineHeight = ov.fontSize * 1.2;
-            const totalTextHeight = lines.length * lineHeight;
-
-            ctx.textAlign = (ov.hAlign || 'left') as CanvasTextAlign;
-            ctx.textBaseline = 'top';
-
-            let tx = ov.rect.x;
-            if (ov.hAlign === 'center') tx = ov.rect.x + ov.rect.width / 2;
-            else if (ov.hAlign === 'right') tx = ov.rect.x + ov.rect.width;
-
-            let ty = ov.rect.y;
-            if (ov.vAlign === 'middle') ty = ov.rect.y + (ov.rect.height - totalTextHeight) / 2;
-            else if (ov.vAlign === 'bottom') ty = ov.rect.y + ov.rect.height - totalTextHeight;
-
-            lines.forEach((line, index) => {
-              ctx.fillText(line, tx, ty + index * lineHeight);
-            });
-
-            if (ctx.letterSpacing !== undefined) {
-              ctx.letterSpacing = '0px';
-            }
-          }
-        }
+        const canvas = await renderSlideToCanvas(slide);
 
         const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/png'));
         if (blob) {
@@ -289,6 +253,19 @@ const App: React.FC = () => {
     } catch (error) {
       console.error(error);
       alert('PDF 생성 중 오류가 발생했습니다.');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleDownloadPpt = async () => {
+    if (currentSlides.length === 0) return;
+    setIsProcessing(true);
+    try {
+      await downloadAsPpt(currentSlides, 'edited_slides.pptx');
+    } catch (error) {
+      console.error(error);
+      alert('PPT 생성 중 오류가 발생했습니다.');
     } finally {
       setIsProcessing(false);
     }
@@ -399,6 +376,9 @@ const App: React.FC = () => {
           </button>
           <button onClick={handleDownloadPdf} disabled={currentSlides.length === 0} className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white rounded-lg text-sm font-bold shadow-lg border border-blue-500/50">
             <FileText size={18} /><span>PDF 다운로드</span>
+          </button>
+          <button onClick={handleDownloadPpt} disabled={currentSlides.length === 0} className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white rounded-lg text-sm font-bold shadow-lg border border-indigo-500/50">
+            <Presentation size={18} /><span>PPT 다운로드</span>
           </button>
         </div>
       </header>
