@@ -136,8 +136,12 @@ const App: React.FC = () => {
     updateHistory(newSlides);
 
     if (keepSelection) {
-      // Keep selection and just clear editing state (though new overlay is created)
+      // Keep selection and advance to next slide for repeated application
       setSelectedOverlayId(null);
+      if (activeSlideIdx < currentSlides.length - 1) {
+        setActiveSlideIdx(prev => prev + 1);
+        // selection is NOT cleared, so Sidebar will auto-detect and show the panel
+      }
     } else {
       setSelection(null);
       setSelectedOverlayId(overlay.id);
