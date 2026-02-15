@@ -2,11 +2,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Rect, SlideData, TextOverlay, OCRResult, VerticalAlign, HorizontalAlign } from '../types';
 import { analyzeTextInImage, generateTextSuggestion, removeTextFromImage } from '../services/geminiService';
-import { 
-  Loader2, 
-  Type as TypeIcon, 
-  Info, 
-  CheckCircle2, 
+import {
+  Loader2,
+  Type as TypeIcon,
+  Info,
+  CheckCircle2,
   Sparkles,
   AlignLeft,
   AlignCenter,
@@ -44,9 +44,9 @@ const FONTS = [
   { name: 'Courier New', value: 'monospace' },
 ];
 
-const Sidebar: React.FC<SidebarProps> = ({ 
-  activeSlide, 
-  selection, 
+const Sidebar: React.FC<SidebarProps> = ({
+  activeSlide,
+  selection,
   selectedOverlayId,
   onApplyOverlay,
   onUpdateOverlays,
@@ -56,7 +56,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   const [isSuggesting, setIsSuggesting] = useState(false);
   const [isGeneratingBg, setIsGeneratingBg] = useState(false);
   const [ocrResult, setOcrResult] = useState<OCRResult | null>(null);
-  
+
   const [replacementText, setReplacementText] = useState('');
   const [fontSize, setFontSize] = useState(16);
   const [fontWeight, setFontWeight] = useState('normal');
@@ -77,24 +77,24 @@ const Sidebar: React.FC<SidebarProps> = ({
   // Sync draft state for live preview when selection exists but not editing
   useEffect(() => {
     if (selection && !selectedOverlayId) {
-       onDraftChange({
-         newText: replacementText,
-         fontSize,
-         fontWeight,
-         fontColor,
-         fontFamily,
-         backgroundColor: isTransparent ? 'rgba(0,0,0,0)' : backgroundColor,
-         backgroundImage,
-         vAlign,
-         hAlign,
-         letterSpacing
-       });
+      onDraftChange({
+        newText: replacementText,
+        fontSize,
+        fontWeight,
+        fontColor,
+        fontFamily,
+        backgroundColor: isTransparent ? 'rgba(0,0,0,0)' : backgroundColor,
+        backgroundImage,
+        vAlign,
+        hAlign,
+        letterSpacing
+      });
     } else {
-       onDraftChange(null);
+      onDraftChange(null);
     }
   }, [
-    selection, selectedOverlayId, replacementText, fontSize, fontWeight, fontColor, 
-    fontFamily, backgroundColor, backgroundImage, isTransparent, vAlign, hAlign, letterSpacing, 
+    selection, selectedOverlayId, replacementText, fontSize, fontWeight, fontColor,
+    fontFamily, backgroundColor, backgroundImage, isTransparent, vAlign, hAlign, letterSpacing,
     onDraftChange
   ]);
 
@@ -104,18 +104,18 @@ const Sidebar: React.FC<SidebarProps> = ({
       // New Selection Made: Reset everything to defaults or estimates
       setOcrResult(null);
       setReplacementText('');
-      
+
       // Heuristic: Font size is often ~75% of the selection height for tight boxes
       const estimatedFontSize = Math.max(12, Math.round(selection.height * 0.75));
       setFontSize(estimatedFontSize);
-      
+
       setFontWeight('normal');
       setFontColor('#000000');
       setFontFamily('Inter');
       setVAlign('middle'); // Default to middle for new text
       setHAlign('left');
       setLetterSpacing(0);
-      
+
       // Background resets are handled by the detectBackgroundColor effect below
       setBackgroundImage(undefined);
       setIsTransparent(false);
@@ -141,7 +141,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       setHAlign(selectedOverlay.hAlign || 'left');
       setLetterSpacing(selectedOverlay.letterSpacing || 0);
       setBackgroundImage(selectedOverlay.backgroundImage);
-      
+
       const bg = selectedOverlay.backgroundColor;
       if (bg === 'rgba(0,0,0,0)' || bg === 'transparent') {
         setIsTransparent(true);
@@ -158,13 +158,13 @@ const Sidebar: React.FC<SidebarProps> = ({
     try {
       const data = ctx.getImageData(0, 0, width, height).data;
       const colorCounts: { [key: string]: { count: number, r: number, g: number, b: number } } = {};
-      
+
       const addPixel = (x: number, y: number) => {
         const i = (y * width + x) * 4;
         const r = data[i];
-        const g = data[i+1];
-        const b = data[i+2];
-        const a = data[i+3];
+        const g = data[i + 1];
+        const b = data[i + 2];
+        const a = data[i + 3];
 
         if (a < 50) return;
 
@@ -180,7 +180,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         colorCounts[key].b += b;
       };
 
-      const depth = 5; 
+      const depth = 5;
       for (let x = 0; x < width; x++) {
         for (let y = 0; y < Math.min(depth, height); y++) addPixel(x, y);
         for (let y = Math.max(0, height - depth); y < height; y++) addPixel(x, y);
@@ -225,12 +225,12 @@ const Sidebar: React.FC<SidebarProps> = ({
     if (!targetRect || !activeSlide) return null;
 
     const padding = usePadding ? 10 : 0;
-    
+
     const startX = Math.max(0, Math.floor(targetRect.x - padding));
     const startY = Math.max(0, Math.floor(targetRect.y - padding));
     const endX = Math.min(activeSlide.width, Math.ceil(targetRect.x + targetRect.width + padding));
     const endY = Math.min(activeSlide.height, Math.ceil(targetRect.y + targetRect.height + padding));
-    
+
     const width = endX - startX;
     const height = endY - startY;
 
@@ -258,7 +258,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           if (!result) return;
           const detectedBg = detectBackgroundColor(result.ctx, result.width, result.height);
           setBackgroundColor(detectedBg);
-          setIsTransparent(false); 
+          setIsTransparent(false);
         } catch (e) {
           console.error(e);
         }
@@ -283,26 +283,26 @@ const Sidebar: React.FC<SidebarProps> = ({
 
       const cropDataUrl = ocrResultCanvas.canvas.toDataURL('image/png');
       const result = await analyzeTextInImage(cropDataUrl);
-      
+
       setOcrResult(result);
       setReplacementText(result.text);
 
       // CRITICAL: Font Size Estimation Logic
       // If AI returns small default (16) but box is big, use box height estimate.
       const boxHeight = selection ? selection.height : (selectedOverlay?.rect.height || 0);
-      const estimatedSize = Math.round(boxHeight * 0.75); 
-      
+      const estimatedSize = Math.round(boxHeight * 0.75);
+
       // Use the larger of AI result or heuristic to avoid tiny text in large boxes
       if (result.fontSize < estimatedSize * 0.8) {
-         setFontSize(estimatedSize);
+        setFontSize(estimatedSize);
       } else {
-         setFontSize(result.fontSize);
+        setFontSize(result.fontSize);
       }
-      
+
       setFontWeight(result.fontWeight);
       setFontColor(result.fontColor);
       setFontFamily(result.fontFamily);
-      
+
       setVAlign('middle');
       setHAlign('center');
       setLetterSpacing(0);
@@ -335,20 +335,25 @@ const Sidebar: React.FC<SidebarProps> = ({
     try {
       // 1. Get exact crop of original image
       const result = await getCroppedCanvas(false);
-      if (!result) return;
+      if (!result) {
+        alert("선택 영역을 가져올 수 없습니다. 영역을 다시 선택해주세요.");
+        return;
+      }
       const cropDataUrl = result.canvas.toDataURL('image/png');
 
       // 2. Call AI to remove text and inpaint
       const inpaintedImage = await removeTextFromImage(cropDataUrl);
-      
+
       if (inpaintedImage) {
         setBackgroundImage(inpaintedImage);
-        
+
         if (isEditing) {
-          updateSelectedOverlay({ 
+          updateSelectedOverlay({
             backgroundImage: inpaintedImage,
           });
         }
+      } else {
+        alert("AI 배경 복원에 실패했습니다.\n\n가능한 원인:\n1. API 키가 올바르지 않음\n2. AI 모델 일시적 오류\n3. 안전 필터(Safety Filter) 작동");
       }
     } catch (error) {
       console.error(error);
@@ -360,7 +365,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 
   const updateSelectedOverlay = (updates: Partial<TextOverlay>) => {
     if (!selectedOverlayId || !activeSlide) return;
-    const newOverlays = activeSlide.overlays.map(ov => 
+    const newOverlays = activeSlide.overlays.map(ov =>
       ov.id === selectedOverlayId ? { ...ov, ...updates } : ov
     );
     onUpdateOverlays(newOverlays);
@@ -388,123 +393,123 @@ const Sidebar: React.FC<SidebarProps> = ({
       flipVertical: false
     }, keepSelection);
   };
-  
+
   const handleUpdate = () => {
-      if (!selectedOverlayId) return;
-      updateSelectedOverlay({
-          newText: replacementText,
-          fontSize,
-          fontWeight,
-          fontColor,
-          fontFamily,
-          backgroundColor: isTransparent ? 'rgba(0,0,0,0)' : backgroundColor,
-          backgroundImage,
-          vAlign,
-          hAlign,
-          letterSpacing
-      });
-      // Clear selection after update if needed, but usually we keep it selected
+    if (!selectedOverlayId) return;
+    updateSelectedOverlay({
+      newText: replacementText,
+      fontSize,
+      fontWeight,
+      fontColor,
+      fontFamily,
+      backgroundColor: isTransparent ? 'rgba(0,0,0,0)' : backgroundColor,
+      backgroundImage,
+      vAlign,
+      hAlign,
+      letterSpacing
+    });
+    // Clear selection after update if needed, but usually we keep it selected
   };
 
   const isEditing = !!selectedOverlayId;
   const hasSelectionOrEditing = !!selection || isEditing;
 
   if (isImageOverlay && selectedOverlay) {
-     return (
-        <div className="w-80 h-full bg-[#1e293b] border-l border-slate-700 flex flex-col p-6 overflow-y-auto">
-             <div className="mb-6 flex items-center justify-between">
-                <h2 className="text-sm font-bold text-slate-200 flex items-center gap-2">
-                    <ImageIcon size={16} className="text-purple-400" />
-                    이미지 편집
-                </h2>
-                <button onClick={() => updateSelectedOverlay({})} className="text-xs text-slate-500 hover:text-white">초기화</button>
-            </div>
-            
-            <div className="space-y-6">
-                <div className="bg-slate-900 rounded-lg p-4 flex flex-col items-center gap-2 border border-slate-800">
-                     <div className="w-full h-32 flex items-center justify-center overflow-hidden">
-                         <img 
-                           src={selectedOverlay.imageSrc} 
-                           className="max-w-full max-h-full object-contain" 
-                           style={{ 
-                               transform: `rotate(${selectedOverlay.rotation || 0}deg) scaleX(${selectedOverlay.flipHorizontal ? -1 : 1}) scaleY(${selectedOverlay.flipVertical ? -1 : 1})`
-                           }}
-                           alt="Preview"
-                        />
-                     </div>
-                     <p className="text-[10px] text-slate-500">미리보기</p>
-                </div>
-
-                {/* Transform Controls */}
-                <div className="space-y-4">
-                    <div className="space-y-2">
-                        <label className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-widest">
-                            <RotateCw size={12} /> 회전 (각도)
-                        </label>
-                        <div className="flex items-center gap-2">
-                            <input 
-                                type="range" 
-                                min="0" 
-                                max="360" 
-                                value={selectedOverlay.rotation || 0} 
-                                onChange={(e) => updateSelectedOverlay({ rotation: parseInt(e.target.value) })}
-                                className="flex-1 h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
-                            />
-                            <span className="text-xs w-8 text-right font-mono">{selectedOverlay.rotation || 0}°</span>
-                        </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                        <button 
-                            onClick={() => updateSelectedOverlay({ flipHorizontal: !selectedOverlay.flipHorizontal })}
-                            className={`p-3 rounded-lg border flex items-center justify-center gap-2 transition-all ${selectedOverlay.flipHorizontal ? 'bg-blue-600 border-blue-500 text-white' : 'bg-slate-800 border-slate-700 text-slate-400 hover:bg-slate-700'}`}
-                        >
-                            <FlipHorizontal size={16} /> <span className="text-xs font-medium">좌우 반전</span>
-                        </button>
-                        <button 
-                            onClick={() => updateSelectedOverlay({ flipVertical: !selectedOverlay.flipVertical })}
-                            className={`p-3 rounded-lg border flex items-center justify-center gap-2 transition-all ${selectedOverlay.flipVertical ? 'bg-blue-600 border-blue-500 text-white' : 'bg-slate-800 border-slate-700 text-slate-400 hover:bg-slate-700'}`}
-                        >
-                            <FlipVertical size={16} /> <span className="text-xs font-medium">상하 반전</span>
-                        </button>
-                    </div>
-                </div>
-
-                {/* Size Controls */}
-                <div className="space-y-2 pt-4 border-t border-slate-800">
-                     <label className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-widest">
-                        <Scaling size={12} /> 크기 (px)
-                    </label>
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-1">
-                            <span className="text-[10px] text-slate-500">너비 (W)</span>
-                            <input 
-                                type="number" 
-                                value={Math.round(selectedOverlay.rect.width)} 
-                                onChange={(e) => {
-                                    const w = parseInt(e.target.value) || 10;
-                                    updateSelectedOverlay({ rect: { ...selectedOverlay.rect, width: w } });
-                                }}
-                                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500" 
-                            />
-                        </div>
-                        <div className="space-y-1">
-                             <span className="text-[10px] text-slate-500">높이 (H)</span>
-                             <input 
-                                type="number" 
-                                value={Math.round(selectedOverlay.rect.height)} 
-                                onChange={(e) => {
-                                    const h = parseInt(e.target.value) || 10;
-                                    updateSelectedOverlay({ rect: { ...selectedOverlay.rect, height: h } });
-                                }}
-                                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500" 
-                            />
-                        </div>
-                    </div>
-                </div>
-            </div>
+    return (
+      <div className="w-80 h-full bg-[#1e293b] border-l border-slate-700 flex flex-col p-6 overflow-y-auto">
+        <div className="mb-6 flex items-center justify-between">
+          <h2 className="text-sm font-bold text-slate-200 flex items-center gap-2">
+            <ImageIcon size={16} className="text-purple-400" />
+            이미지 편집
+          </h2>
+          <button onClick={() => updateSelectedOverlay({})} className="text-xs text-slate-500 hover:text-white">초기화</button>
         </div>
-     )
+
+        <div className="space-y-6">
+          <div className="bg-slate-900 rounded-lg p-4 flex flex-col items-center gap-2 border border-slate-800">
+            <div className="w-full h-32 flex items-center justify-center overflow-hidden">
+              <img
+                src={selectedOverlay.imageSrc}
+                className="max-w-full max-h-full object-contain"
+                style={{
+                  transform: `rotate(${selectedOverlay.rotation || 0}deg) scaleX(${selectedOverlay.flipHorizontal ? -1 : 1}) scaleY(${selectedOverlay.flipVertical ? -1 : 1})`
+                }}
+                alt="Preview"
+              />
+            </div>
+            <p className="text-[10px] text-slate-500">미리보기</p>
+          </div>
+
+          {/* Transform Controls */}
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <label className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                <RotateCw size={12} /> 회전 (각도)
+              </label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="range"
+                  min="0"
+                  max="360"
+                  value={selectedOverlay.rotation || 0}
+                  onChange={(e) => updateSelectedOverlay({ rotation: parseInt(e.target.value) })}
+                  className="flex-1 h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                />
+                <span className="text-xs w-8 text-right font-mono">{selectedOverlay.rotation || 0}°</span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <button
+                onClick={() => updateSelectedOverlay({ flipHorizontal: !selectedOverlay.flipHorizontal })}
+                className={`p-3 rounded-lg border flex items-center justify-center gap-2 transition-all ${selectedOverlay.flipHorizontal ? 'bg-blue-600 border-blue-500 text-white' : 'bg-slate-800 border-slate-700 text-slate-400 hover:bg-slate-700'}`}
+              >
+                <FlipHorizontal size={16} /> <span className="text-xs font-medium">좌우 반전</span>
+              </button>
+              <button
+                onClick={() => updateSelectedOverlay({ flipVertical: !selectedOverlay.flipVertical })}
+                className={`p-3 rounded-lg border flex items-center justify-center gap-2 transition-all ${selectedOverlay.flipVertical ? 'bg-blue-600 border-blue-500 text-white' : 'bg-slate-800 border-slate-700 text-slate-400 hover:bg-slate-700'}`}
+              >
+                <FlipVertical size={16} /> <span className="text-xs font-medium">상하 반전</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Size Controls */}
+          <div className="space-y-2 pt-4 border-t border-slate-800">
+            <label className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+              <Scaling size={12} /> 크기 (px)
+            </label>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <span className="text-[10px] text-slate-500">너비 (W)</span>
+                <input
+                  type="number"
+                  value={Math.round(selectedOverlay.rect.width)}
+                  onChange={(e) => {
+                    const w = parseInt(e.target.value) || 10;
+                    updateSelectedOverlay({ rect: { ...selectedOverlay.rect, width: w } });
+                  }}
+                  className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
+                />
+              </div>
+              <div className="space-y-1">
+                <span className="text-[10px] text-slate-500">높이 (H)</span>
+                <input
+                  type="number"
+                  value={Math.round(selectedOverlay.rect.height)}
+                  onChange={(e) => {
+                    const h = parseInt(e.target.value) || 10;
+                    updateSelectedOverlay({ rect: { ...selectedOverlay.rect, height: h } });
+                  }}
+                  className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -521,7 +526,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           <div className="w-16 h-16 rounded-xl bg-slate-800 flex items-center justify-center mb-4 border border-slate-700">
             <Info size={32} className="opacity-50" />
           </div>
-          <p className="text-sm">텍스트 교체 영역을 선택하거나<br/>교체된 텍스트를 클릭하세요</p>
+          <p className="text-sm">텍스트 교체 영역을 선택하거나<br />교체된 텍스트를 클릭하세요</p>
         </div>
       ) : (
         <div className="space-y-6">
@@ -538,8 +543,8 @@ const Sidebar: React.FC<SidebarProps> = ({
                   <div className="p-3 bg-slate-900 rounded text-sm text-slate-300 italic border border-slate-800">"{ocrResult.text}"</div>
                 </div>
               ) : (
-                <button 
-                  onClick={handleAnalyze} 
+                <button
+                  onClick={handleAnalyze}
                   className="w-full bg-slate-700 hover:bg-slate-600 text-white text-xs font-bold py-3 rounded-lg flex items-center justify-center gap-2 transition-all"
                 >
                   <Sparkles size={14} className="text-blue-400" /> AI 분석 (OCR) 실행
@@ -552,7 +557,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             <div className="space-y-2">
               <div className="flex justify-between items-center">
                 <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest">내용</label>
-                <button 
+                <button
                   onClick={handleAiSuggest}
                   disabled={isSuggesting || (!replacementText && !ocrResult)}
                   className="flex items-center gap-1.5 text-[10px] font-bold text-blue-400 hover:text-blue-300 disabled:opacity-50 transition-colors"
@@ -561,12 +566,12 @@ const Sidebar: React.FC<SidebarProps> = ({
                   AI 추천
                 </button>
               </div>
-              <textarea 
-                value={replacementText} 
+              <textarea
+                value={replacementText}
                 onChange={(e) => {
                   setReplacementText(e.target.value);
                   if (isEditing) updateSelectedOverlay({ newText: e.target.value });
-                }} 
+                }}
                 className="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-sm h-24 resize-none focus:outline-none focus:border-blue-500 text-slate-200 placeholder-slate-600"
                 placeholder={ocrResult ? "텍스트를 입력하세요" : "OCR 분석을 먼저 실행하세요"}
               />
@@ -593,7 +598,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 
             <div className="space-y-2">
               <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest">글꼴</label>
-              <select 
+              <select
                 value={fontFamily}
                 onChange={(e) => {
                   setFontFamily(e.target.value);
@@ -608,23 +613,23 @@ const Sidebar: React.FC<SidebarProps> = ({
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-widest">크기</label>
-                <input 
-                  type="number" 
-                  value={fontSize} 
+                <input
+                  type="number"
+                  value={fontSize}
                   onChange={(e) => {
                     const val = parseInt(e.target.value);
                     setFontSize(val);
                     if (isEditing) updateSelectedOverlay({ fontSize: val });
                   }}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500" 
+                  className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
                 />
               </div>
               <div className="space-y-2">
                 <label className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-widest">글자 색상</label>
                 <div className="flex gap-2 items-center bg-slate-900 border border-slate-700 rounded-lg px-2 py-1">
-                  <input 
-                    type="color" 
-                    value={fontColor} 
+                  <input
+                    type="color"
+                    value={fontColor}
                     onChange={(e) => {
                       setFontColor(e.target.value);
                       if (isEditing) updateSelectedOverlay({ fontColor: e.target.value });
@@ -637,101 +642,101 @@ const Sidebar: React.FC<SidebarProps> = ({
             </div>
 
             <div className="space-y-2">
-               <label className="flex items-center justify-between text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">
-                 <span>배경 (Background)</span>
-                 <div className="flex items-center gap-2">
-                    <button 
-                      onClick={handleAiBackgroundRestore}
-                      disabled={isGeneratingBg || !hasSelectionOrEditing}
-                      className="flex items-center gap-1 text-[10px] text-blue-400 hover:text-blue-300 disabled:opacity-50 transition-colors"
-                      title="현재 영역의 텍스트를 AI로 지우고 자연스러운 배경을 생성합니다"
+              <label className="flex items-center justify-between text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">
+                <span>배경 (Background)</span>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={handleAiBackgroundRestore}
+                    disabled={isGeneratingBg || !hasSelectionOrEditing}
+                    className="flex items-center gap-1 text-[10px] text-blue-400 hover:text-blue-300 disabled:opacity-50 transition-colors"
+                    title="현재 영역의 텍스트를 AI로 지우고 자연스러운 배경을 생성합니다"
+                  >
+                    {isGeneratingBg ? <Loader2 size={10} className="animate-spin" /> : <Eraser size={10} />}
+                    AI 배경 복원
+                  </button>
+                  {backgroundImage && (
+                    <button
+                      onClick={() => {
+                        setBackgroundImage(undefined);
+                        setIsTransparent(false);
+                        setBackgroundColor('#ffffff');
+                        if (isEditing) {
+                          updateSelectedOverlay({ backgroundImage: undefined, backgroundColor: '#ffffff' });
+                        }
+                      }}
+                      className="text-slate-500 hover:text-red-400 transition-colors"
+                      title="배경 이미지 삭제"
                     >
-                      {isGeneratingBg ? <Loader2 size={10} className="animate-spin" /> : <Eraser size={10} />}
-                      AI 배경 복원
+                      <Trash2 size={12} />
                     </button>
-                    {backgroundImage && (
-                      <button
-                        onClick={() => {
-                          setBackgroundImage(undefined);
-                          setIsTransparent(false);
-                          setBackgroundColor('#ffffff');
-                          if (isEditing) {
-                            updateSelectedOverlay({ backgroundImage: undefined, backgroundColor: '#ffffff' });
-                          }
-                        }}
-                        className="text-slate-500 hover:text-red-400 transition-colors"
-                        title="배경 이미지 삭제"
-                      >
-                        <Trash2 size={12} />
-                      </button>
-                    )}
-                 </div>
-               </label>
-               
-               {backgroundImage && (
-                 <div 
-                   className="mb-2 relative w-full h-12 rounded-lg border border-slate-700 overflow-hidden bg-slate-900 cursor-pointer hover:ring-1 hover:ring-blue-500 transition-all"
-                   onClick={() => {
-                     // Clicking thumbnail ensures background image is active (redundant but gives feedback)
-                     if (backgroundImage) setBackgroundImage(backgroundImage);
-                   }}
-                 >
-                   <img src={backgroundImage} alt="AI Background" className="w-full h-full object-cover" />
-                 </div>
-               )}
+                  )}
+                </div>
+              </label>
 
-               <div className="flex items-center justify-between bg-slate-900 border border-slate-700 rounded-lg px-3 py-2">
-                 <div className="flex items-center gap-3">
-                   <div className="relative flex items-center">
-                     <input 
-                       type="color" 
-                       value={backgroundColor}
-                       disabled={isTransparent}
-                       onChange={(e) => {
-                         setBackgroundColor(e.target.value);
-                         // If manually changing color, remove image
-                         setBackgroundImage(undefined);
-                         if (isEditing) updateSelectedOverlay({ backgroundColor: e.target.value, backgroundImage: undefined });
-                       }}
-                       className={`w-6 h-6 bg-transparent border-none p-0 cursor-pointer ${isTransparent ? 'opacity-20 cursor-not-allowed' : ''}`}
-                     />
-                     {isTransparent && <div className="absolute inset-0 bg-slate-900/50 pointer-events-none" />}
-                   </div>
-                   <span className={`text-xs font-mono uppercase ${isTransparent ? 'text-slate-600' : 'text-slate-300'}`}>
-                     {backgroundColor}
-                   </span>
-                 </div>
-                 
-                 <label className="flex items-center gap-2 cursor-pointer group select-none">
-                   <input 
-                     type="checkbox" 
-                     checked={isTransparent}
-                     onChange={(e) => {
-                       const checked = e.target.checked;
-                       setIsTransparent(checked);
-                       if (isEditing) {
-                         // If checking off transparency, just ensure correct alpha, do not delete image
-                         updateSelectedOverlay({ backgroundColor: checked ? 'rgba(0,0,0,0)' : backgroundColor });
-                       }
-                     }}
-                     className="w-4 h-4 rounded border-slate-600 bg-slate-800 text-blue-600 focus:ring-0 focus:ring-offset-0 transition-colors group-hover:border-slate-500"
-                   />
-                   <span className="text-xs text-slate-400 group-hover:text-slate-300 transition-colors">투명</span>
-                 </label>
-               </div>
+              {backgroundImage && (
+                <div
+                  className="mb-2 relative w-full h-12 rounded-lg border border-slate-700 overflow-hidden bg-slate-900 cursor-pointer hover:ring-1 hover:ring-blue-500 transition-all"
+                  onClick={() => {
+                    // Clicking thumbnail ensures background image is active (redundant but gives feedback)
+                    if (backgroundImage) setBackgroundImage(backgroundImage);
+                  }}
+                >
+                  <img src={backgroundImage} alt="AI Background" className="w-full h-full object-cover" />
+                </div>
+              )}
+
+              <div className="flex items-center justify-between bg-slate-900 border border-slate-700 rounded-lg px-3 py-2">
+                <div className="flex items-center gap-3">
+                  <div className="relative flex items-center">
+                    <input
+                      type="color"
+                      value={backgroundColor}
+                      disabled={isTransparent}
+                      onChange={(e) => {
+                        setBackgroundColor(e.target.value);
+                        // If manually changing color, remove image
+                        setBackgroundImage(undefined);
+                        if (isEditing) updateSelectedOverlay({ backgroundColor: e.target.value, backgroundImage: undefined });
+                      }}
+                      className={`w-6 h-6 bg-transparent border-none p-0 cursor-pointer ${isTransparent ? 'opacity-20 cursor-not-allowed' : ''}`}
+                    />
+                    {isTransparent && <div className="absolute inset-0 bg-slate-900/50 pointer-events-none" />}
+                  </div>
+                  <span className={`text-xs font-mono uppercase ${isTransparent ? 'text-slate-600' : 'text-slate-300'}`}>
+                    {backgroundColor}
+                  </span>
+                </div>
+
+                <label className="flex items-center gap-2 cursor-pointer group select-none">
+                  <input
+                    type="checkbox"
+                    checked={isTransparent}
+                    onChange={(e) => {
+                      const checked = e.target.checked;
+                      setIsTransparent(checked);
+                      if (isEditing) {
+                        // If checking off transparency, just ensure correct alpha, do not delete image
+                        updateSelectedOverlay({ backgroundColor: checked ? 'rgba(0,0,0,0)' : backgroundColor });
+                      }
+                    }}
+                    className="w-4 h-4 rounded border-slate-600 bg-slate-800 text-blue-600 focus:ring-0 focus:ring-offset-0 transition-colors group-hover:border-slate-500"
+                  />
+                  <span className="text-xs text-slate-400 group-hover:text-slate-300 transition-colors">투명</span>
+                </label>
+              </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-widest">두께</label>
                 <div className="flex p-1 bg-slate-900 rounded-lg border border-slate-800">
-                  <button 
+                  <button
                     onClick={() => { setFontWeight('normal'); if (isEditing) updateSelectedOverlay({ fontWeight: 'normal' }); }}
                     className={`flex-1 py-1.5 text-xs rounded transition-all ${fontWeight === 'normal' ? 'bg-slate-700 text-white' : 'text-slate-500'}`}
                   >
                     Normal
                   </button>
-                  <button 
+                  <button
                     onClick={() => { setFontWeight('bold'); if (isEditing) updateSelectedOverlay({ fontWeight: 'bold' }); }}
                     className={`flex-1 py-1.5 text-xs font-bold rounded transition-all ${fontWeight === 'bold' ? 'bg-slate-700 text-white' : 'text-slate-500'}`}
                   >
@@ -743,16 +748,16 @@ const Sidebar: React.FC<SidebarProps> = ({
                 <label className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-widest">자간 (Spacing)</label>
                 <div className="flex items-center bg-slate-900 border border-slate-700 rounded-lg px-2">
                   <MoveHorizontal size={14} className="text-slate-500 mr-2" />
-                  <input 
-                    type="number" 
+                  <input
+                    type="number"
                     step="0.1"
-                    value={letterSpacing} 
+                    value={letterSpacing}
                     onChange={(e) => {
                       const val = parseFloat(e.target.value);
                       setLetterSpacing(val);
                       if (isEditing) updateSelectedOverlay({ letterSpacing: val });
                     }}
-                    className="w-full bg-transparent py-2 text-sm focus:outline-none" 
+                    className="w-full bg-transparent py-2 text-sm focus:outline-none"
                   />
                 </div>
               </div>
@@ -762,16 +767,16 @@ const Sidebar: React.FC<SidebarProps> = ({
             <div className="space-y-2 mt-4">
               {!isEditing ? (
                 <>
-                  <button 
-                    onClick={() => handleApply(false)} 
-                    disabled={!selection} 
+                  <button
+                    onClick={() => handleApply(false)}
+                    disabled={!selection}
                     className="w-full bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white font-bold py-3 rounded-lg flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-all"
                   >
                     <CheckCircle2 size={18} /> 텍스트 적용
                   </button>
-                  <button 
-                    onClick={() => handleApply(true)} 
-                    disabled={!selection} 
+                  <button
+                    onClick={() => handleApply(true)}
+                    disabled={!selection}
                     className="w-full bg-slate-700 hover:bg-slate-600 disabled:opacity-50 text-slate-200 font-bold py-3 rounded-lg flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-all border border-slate-600"
                     title="적용 후 선택 영역 유지 (워터마크 제거 등 반복 작업용)"
                   >
@@ -779,11 +784,11 @@ const Sidebar: React.FC<SidebarProps> = ({
                   </button>
                 </>
               ) : (
-                <button 
-                   onClick={handleUpdate}
-                   className="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-lg flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-all"
+                <button
+                  onClick={handleUpdate}
+                  className="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-lg flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-all"
                 >
-                   <Save size={18} /> 수정 완료
+                  <Save size={18} /> 수정 완료
                 </button>
               )}
             </div>
