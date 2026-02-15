@@ -357,6 +357,24 @@ const EditorCanvas: React.FC<EditorCanvasProps> = ({
 
   const getScreenCoords = (e: React.MouseEvent | any): Point => ({ x: e.clientX, y: e.clientY });
 
+  const normalizeRect = (rect: Rect): Rect => {
+    let { x, y, width, height } = rect;
+    if (width < 0) {
+      x += width;
+      width = Math.abs(width);
+    }
+    if (height < 0) {
+      y += height;
+      height = Math.abs(height);
+    }
+    return {
+      x,
+      y,
+      width: Math.max(width, MIN_RECT_SIZE),
+      height: Math.max(height, MIN_RECT_SIZE),
+    };
+  };
+
   // Rotate a point around a center
   const rotatePoint = (point: Point, center: Point, angle: number): Point => {
     const rad = (angle * Math.PI) / 180;
@@ -543,7 +561,7 @@ const EditorCanvas: React.FC<EditorCanvasProps> = ({
             if (dragType.includes('w')) { newRect.x += dx; newRect.width -= dx; }
             if (dragType.includes('s')) newRect.height += dy;
             if (dragType.includes('n')) { newRect.y += dy; newRect.height -= dy; }
-            setSelection(newRect);
+            setSelection(normalizeRect(newRect));
        } else if (selectedOverlayId) {
             const ov = slide.overlays.find(o => o.id === selectedOverlayId);
             if (ov) {
@@ -552,6 +570,7 @@ const EditorCanvas: React.FC<EditorCanvasProps> = ({
                 if (dragType.includes('w')) { newRect.x += dx; newRect.width -= dx; }
                 if (dragType.includes('s')) newRect.height += dy;
                 if (dragType.includes('n')) { newRect.y += dy; newRect.height -= dy; }
+                newRect = normalizeRect(newRect);
                 
                 const newOverlays = slide.overlays.map(o => o.id === selectedOverlayId ? { ...o, rect: newRect } : o);
                 onUpdateOverlays(newOverlays);

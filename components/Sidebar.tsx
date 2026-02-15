@@ -2,6 +2,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Rect, SlideData, TextOverlay, OCRResult, VerticalAlign, HorizontalAlign } from '../types';
 import { analyzeTextInImage, generateTextSuggestion, removeTextFromImage } from '../services/geminiService';
+import { loadImage } from '../services/imageUtils';
+import { createOverlayId } from '../utils/id';
 import {
   Loader2,
   Type as TypeIcon,
@@ -242,9 +244,7 @@ const Sidebar: React.FC<SidebarProps> = ({
     const ctx = canvas.getContext('2d');
     if (!ctx) return null;
 
-    const img = new Image();
-    img.src = activeSlide.dataUrl;
-    await new Promise(resolve => img.onload = resolve);
+    const img = await loadImage(activeSlide.dataUrl);
 
     ctx.drawImage(img, startX, startY, width, height, 0, 0, width, height);
     return { canvas, ctx, width, height };
@@ -375,7 +375,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   const handleApply = (keepSelection: boolean = false) => {
     if (!selection) return;
     onApplyOverlay({
-      id: Math.random().toString(36).substr(2, 9),
+      id: createOverlayId(),
       rect: { ...selection },
       originalText: ocrResult?.text || '',
       newText: replacementText,

@@ -5,6 +5,8 @@ import { saveAs } from 'file-saver';
 import { SlideData, Rect, TextOverlay } from './types';
 import { convertPdfToImages, downloadAsPdf } from './services/pdfService';
 import { removeAllTextFromSlide } from './services/geminiService';
+import { loadImage, readFileAsDataUrl } from './services/imageUtils';
+import { createOverlayId } from './utils/id';
 import EditorCanvas from './components/EditorCanvas';
 import Sidebar from './components/Sidebar';
 import SlidePanel from './components/SlidePanel';
@@ -53,24 +55,15 @@ const App: React.FC = () => {
       if (file.type === 'application/pdf') {
         newSlides = await convertPdfToImages(file);
       } else if (file.type.startsWith('image/')) {
-        await new Promise<void>((resolve) => {
-          const reader = new FileReader();
-          reader.onload = (ev) => {
-            const img = new Image();
-            img.onload = () => {
-              newSlides = [{
-                index: 0,
-                dataUrl: ev.target?.result as string,
-                width: img.width,
-                height: img.height,
-                overlays: []
-              }];
-              resolve();
-            };
-            img.src = ev.target?.result as string;
-          };
-          reader.readAsDataURL(file);
-        });
+        const imageDataUrl = await readFileAsDataUrl(file);
+        const img = await loadImage(imageDataUrl);
+        newSlides = [{
+          index: 0,
+          dataUrl: imageDataUrl,
+          width: img.width,
+          height: img.height,
+          overlays: []
+        }];
       }
 
       // Initialize History
@@ -91,38 +84,32 @@ const App: React.FC = () => {
     if (!file || currentSlides.length === 0) return;
 
     try {
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        const imageSrc = ev.target?.result as string;
-        const img = new Image();
-        img.onload = () => {
-          // Default to center of the slide
-          const slide = currentSlides[activeSlideIdx];
-          const width = 200; // Default width
-          const height = (img.height / img.width) * width;
-          const x = (slide.width - width) / 2;
-          const y = (slide.height - height) / 2;
+      const imageSrc = await readFileAsDataUrl(file);
+      const img = await loadImage(imageSrc);
 
-          const newOverlay: TextOverlay = {
-            id: Math.random().toString(36).substr(2, 9),
-            type: 'image',
-            rect: { x, y, width, height },
-            imageSrc: imageSrc,
-            originalText: '',
-            newText: '',
-            fontSize: 0,
-            fontWeight: 'normal',
-            fontColor: 'transparent',
-            fontFamily: 'sans-serif',
-            backgroundColor: 'transparent',
-            vAlign: 'top',
-            hAlign: 'left'
-          };
-          handleApplyOverlay(newOverlay);
-        };
-        img.src = imageSrc;
+      // Default to center of the slide
+      const slide = currentSlides[activeSlideIdx];
+      const width = 200;
+      const height = (img.height / img.width) * width;
+      const x = (slide.width - width) / 2;
+      const y = (slide.height - height) / 2;
+
+      const newOverlay: TextOverlay = {
+        id: createOverlayId(),
+        type: 'image',
+        rect: { x, y, width, height },
+        imageSrc: imageSrc,
+        originalText: '',
+        newText: '',
+        fontSize: 0,
+        fontWeight: 'normal',
+        fontColor: 'transparent',
+        fontFamily: 'sans-serif',
+        backgroundColor: 'transparent',
+        vAlign: 'top',
+        hAlign: 'left'
       };
-      reader.readAsDataURL(file);
+      handleApplyOverlay(newOverlay);
     } catch (err) {
       console.error(err);
       alert('이미지 추가 중 오류가 발생했습니다.');
@@ -205,7 +192,10 @@ const App: React.FC = () => {
         const canvas = document.createElement('canvas');
         canvas.width = slide.width;
         canvas.height = slide.height;
-        const ctx = canvas.getContext('2d')!;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          throw new Error('Canvas context initialization failed.');
+        }
 
         // 1. Draw Original Image
         const img = new Image();
@@ -291,9 +281,17 @@ const App: React.FC = () => {
     }
   };
 
-  const handleDownloadPdf = () => {
+  const handleDownloadPdf = async () => {
     if (currentSlides.length === 0) return;
-    downloadAsPdf(currentSlides, 'edited_slides.pdf');
+    setIsProcessing(true);
+    try {
+      await downloadAsPdf(currentSlides, 'edited_slides.pdf');
+    } catch (error) {
+      console.error(error);
+      alert('PDF 생성 중 오류가 발생했습니다.');
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const handleSlideDelete = (index: number) => {
