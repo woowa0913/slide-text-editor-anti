@@ -1,6 +1,6 @@
 
 import React, { useRef, useEffect, useState, useCallback } from 'react';
-import { SlideData, Rect, Point, HandleType, TextOverlay } from '../types';
+import { SlideData, Rect, Point, HandleType, TextOverlay, ErasePath } from '../types';
 import { COLORS, HANDLE_SIZE, MIN_RECT_SIZE, ZOOM_STEP, MAX_ZOOM, MIN_ZOOM, PAN_STEP } from '../constants';
 
 interface EditorCanvasProps {
@@ -8,6 +8,11 @@ interface EditorCanvasProps {
   selectedOverlayId: string | null;
   draftOverlay: Partial<TextOverlay> | null; // New prop for live preview
   isDark: boolean;
+  isEraseMode: boolean;
+  eraseTool: 'add' | 'remove';
+  eraseBrushSize: number;
+  erasePaths: ErasePath[];
+  onErasePathCommit: (path: ErasePath) => void;
   onSelectionChange: (rect: Rect | null) => void;
   onOverlaySelect: (id: string | null) => void;
   onUpdateOverlays: (overlays: TextOverlay[]) => void;
@@ -18,6 +23,11 @@ const EditorCanvas: React.FC<EditorCanvasProps> = ({
   selectedOverlayId,
   draftOverlay,
   isDark,
+  isEraseMode,
+  eraseTool,
+  eraseBrushSize,
+  erasePaths,
+  onErasePathCommit,
   onSelectionChange, 
   onOverlaySelect,
   onUpdateOverlays 
@@ -36,6 +46,8 @@ const EditorCanvas: React.FC<EditorCanvasProps> = ({
   const [isDraggingOverlay, setIsDraggingOverlay] = useState(false);
   const [isRotating, setIsRotating] = useState(false);
   const [isPanning, setIsPanning] = useState(false);
+  const [isErasing, setIsErasing] = useState(false);
+  const [currentErasePath, setCurrentErasePath] = useState<ErasePath | null>(null);
   
   const [dragType, setDragType] = useState<'move' | HandleType | null>(null);
   const [startPoint, setStartPoint] = useState<Point | null>(null);
@@ -305,6 +317,39 @@ const EditorCanvas: React.FC<EditorCanvasProps> = ({
        drawOverlay(ctx, overlay, isSelected);
     });
 
+    if (isEraseMode) {
+      const previewPaths = currentErasePath ? [...erasePaths, currentErasePath] : erasePaths;
+      const maskCanvas = document.createElement('canvas');
+      maskCanvas.width = slide.width;
+      maskCanvas.height = slide.height;
+      const maskCtx = maskCanvas.getContext('2d');
+      if (maskCtx) {
+        previewPaths.forEach((path) => {
+          if (path.points.length === 0) return;
+          maskCtx.save();
+          maskCtx.lineCap = 'round';
+          maskCtx.lineJoin = 'round';
+          maskCtx.lineWidth = path.size;
+          maskCtx.strokeStyle = 'rgba(239, 68, 68, 0.9)';
+          maskCtx.globalCompositeOperation = path.mode === 'add' ? 'source-over' : 'destination-out';
+          maskCtx.beginPath();
+          maskCtx.moveTo(path.points[0].x, path.points[0].y);
+          for (let i = 1; i < path.points.length; i++) {
+            maskCtx.lineTo(path.points[i].x, path.points[i].y);
+          }
+          if (path.points.length === 1) {
+            maskCtx.arc(path.points[0].x, path.points[0].y, path.size / 2, 0, Math.PI * 2);
+          }
+          maskCtx.stroke();
+          maskCtx.restore();
+        });
+        ctx.save();
+        ctx.globalAlpha = 0.35;
+        ctx.drawImage(maskCanvas, 0, 0);
+        ctx.restore();
+      }
+    }
+
     // Draw Drawing Selection (Blue Box)
     if (selection) {
        // Standard Selection Box for new areas
@@ -341,7 +386,7 @@ const EditorCanvas: React.FC<EditorCanvasProps> = ({
     }
 
     ctx.restore();
-  }, [image, slide.overlays, selection, zoom, offset, selectedOverlayId, draftOverlay, drawOverlay]);
+  }, [image, slide, slide.overlays, selection, zoom, offset, selectedOverlayId, draftOverlay, drawOverlay, isEraseMode, erasePaths, currentErasePath]);
 
   useEffect(() => {
     draw();
@@ -433,6 +478,17 @@ const EditorCanvas: React.FC<EditorCanvasProps> = ({
   };
 
   const handleMouseDown = (e: React.MouseEvent) => {
+    if (isEraseMode) {
+      if (e.button !== 0) return;
+      const p = getCanvasCoords(e);
+      setIsErasing(true);
+      setCurrentErasePath({ mode: eraseTool, size: eraseBrushSize, points: [p] });
+      setSelection(null);
+      onSelectionChange(null);
+      onOverlaySelect(null);
+      return;
+    }
+
     if (isSpacePressed || e.button === 1) {
       setIsPanning(true);
       setStartPoint(getScreenCoords(e));
@@ -494,7 +550,8 @@ const EditorCanvas: React.FC<EditorCanvasProps> = ({
     
     // Cursor Logic
     if (canvasRef.current) {
-      if (isSpacePressed || isPanning) canvasRef.current.style.cursor = isPanning ? 'grabbing' : 'grab';
+      if (isEraseMode) canvasRef.current.style.cursor = 'crosshair';
+      else if (isSpacePressed || isPanning) canvasRef.current.style.cursor = isPanning ? 'grabbing' : 'grab';
       else if (isRotating) canvasRef.current.style.cursor = 'alias';
       else if (isDraggingOverlay) canvasRef.current.style.cursor = 'grabbing';
       else if (isResizingSelection) canvasRef.current.style.cursor = 'nwse-resize';
@@ -513,6 +570,14 @@ const EditorCanvas: React.FC<EditorCanvasProps> = ({
           }
           if (targetRect && getHandleAt(canvasP, targetRect, rot)) canvasRef.current.style.cursor = 'crosshair';
       }
+    }
+
+    if (isEraseMode && isErasing) {
+      setCurrentErasePath((prev) => {
+        if (!prev) return prev;
+        return { ...prev, points: [...prev.points, canvasP] };
+      });
+      return;
     }
 
     if (isPanning && startPoint) {
@@ -589,6 +654,15 @@ const EditorCanvas: React.FC<EditorCanvasProps> = ({
   };
 
   const handleMouseUp = () => {
+    if (isEraseMode) {
+      if (isErasing && currentErasePath) {
+        onErasePathCommit(currentErasePath);
+      }
+      setCurrentErasePath(null);
+      setIsErasing(false);
+      return;
+    }
+
     if (isDrawing || isResizingSelection) {
       if (selection && (selection.width < MIN_RECT_SIZE || selection.height < MIN_RECT_SIZE)) {
         setSelection(null);
@@ -602,6 +676,8 @@ const EditorCanvas: React.FC<EditorCanvasProps> = ({
     setIsResizingSelection(false);
     setIsRotating(false);
     setIsPanning(false);
+    setIsErasing(false);
+    setCurrentErasePath(null);
     setStartPoint(null);
   };
 
@@ -621,6 +697,18 @@ const EditorCanvas: React.FC<EditorCanvasProps> = ({
           color: isDark ? '#e5e7eb' : '#374151'
         }}
       >
+        {isEraseMode ? (
+          <div className="flex items-center gap-2">
+            <span
+              className="px-1.5 py-0.5 rounded text-[10px] font-bold"
+              style={{ backgroundColor: isDark ? '#11151d' : '#eef0ff', color: isDark ? '#a5b4fc' : '#4f46e5' }}
+            >
+              Erase Brush
+            </span>
+            <span>지울 영역을 칠해 주세요</span>
+          </div>
+        ) : (
+          <>
         <div className="flex items-center gap-2">
           <span
             className="px-1.5 py-0.5 rounded text-[10px] font-bold"
@@ -654,6 +742,8 @@ const EditorCanvas: React.FC<EditorCanvasProps> = ({
         <div className="flex items-center gap-2">
            <span className="font-mono" style={{ color: isDark ? '#9ca3af' : '#64748b' }}>{Math.round(zoom * 100)}%</span>
         </div>
+          </>
+        )}
       </div>
     </div>
   );

@@ -1,13 +1,14 @@
 
 import React, { useState, useRef, useCallback } from 'react';
 import { SlideData } from '../types';
-import { Trash2, GripVertical, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Trash2, GripVertical, ChevronLeft, ChevronRight, Copy } from 'lucide-react';
 
 interface SlidePanelProps {
     slides: SlideData[];
     activeSlideIdx: number;
     onSlideSelect: (index: number) => void;
     onSlideDelete: (index: number) => void;
+    onSlideDuplicate: (index: number) => void;
     onSlideReorder: (fromIndex: number, toIndex: number) => void;
     isCollapsed: boolean;
     onToggleCollapse: () => void;
@@ -19,6 +20,7 @@ const SlidePanel: React.FC<SlidePanelProps> = ({
     activeSlideIdx,
     onSlideSelect,
     onSlideDelete,
+    onSlideDuplicate,
     onSlideReorder,
     isCollapsed,
     onToggleCollapse,
@@ -146,15 +148,24 @@ const SlidePanel: React.FC<SlidePanelProps> = ({
                                 </div>
 
                                 {/* Delete button (bottom-right) */}
-                                {slides.length > 1 && (
+                                <div className="absolute bottom-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
                                     <button
-                                        onClick={(e) => handleDelete(e, index)}
-                                        className="absolute bottom-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity p-1 bg-red-600/80 hover:bg-red-500 rounded text-white"
-                                        title="슬라이드 삭제"
+                                        onClick={(e) => { e.stopPropagation(); onSlideDuplicate(index); }}
+                                        className="p-1 bg-indigo-600/80 hover:bg-indigo-500 rounded text-white"
+                                        title="슬라이드 복제"
                                     >
-                                        <Trash2 size={10} />
+                                        <Copy size={10} />
                                     </button>
-                                )}
+                                    {slides.length > 1 && (
+                                        <button
+                                            onClick={(e) => handleDelete(e, index)}
+                                            className="p-1 bg-red-600/80 hover:bg-red-500 rounded text-white"
+                                            title="슬라이드 삭제"
+                                        >
+                                            <Trash2 size={10} />
+                                        </button>
+                                    )}
+                                </div>
                             </div>
 
                             {/* Slide number */}

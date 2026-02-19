@@ -2,16 +2,18 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
-import { SlideData, Rect, TextOverlay } from './types';
+import { SlideData, Rect, TextOverlay, ErasePath } from './types';
 import { convertPdfToImages, downloadAsPdf } from './services/pdfService';
 import { downloadAsPpt } from './services/pptService';
-import { removeAllTextFromSlide } from './services/geminiService';
-import { readFileAsDataUrl } from './services/imageUtils';
+import { removeAllTextFromSlide, removeTextFromImage } from './services/geminiService';
+import { loadImage, readFileAsDataUrl } from './services/imageUtils';
 import { createOverlayId } from './utils/id';
 import { renderSlideToCanvas } from './services/slideRenderService';
 import EditorCanvas from './components/EditorCanvas';
 import Sidebar from './components/Sidebar';
 import SlidePanel from './components/SlidePanel';
+import { extractConnectedMaskRects } from './utils/eraseMask';
+import { duplicateSlideAtIndex } from './utils/slideOperations';
 import {
   FileUp,
   Download,
@@ -24,7 +26,11 @@ import {
   Plus,
   Eraser,
   Moon,
-  Sun
+  Sun,
+  Check,
+  X,
+  Paintbrush,
+  CircleOff
 } from 'lucide-react';
 import { getKtCloudLogoByMode, getThemeByMode, toggleThemeMode, ThemeMode } from './theme';
 
@@ -42,6 +48,11 @@ const App: React.FC = () => {
 
   // Draft overlay state for preview (lifted from Sidebar)
   const [draftOverlay, setDraftOverlay] = useState<Partial<TextOverlay> | null>(null);
+  const [isEraseMode, setIsEraseMode] = useState(false);
+  const [eraseTool, setEraseTool] = useState<'add' | 'remove'>('add');
+  const [eraseBrushSize, setEraseBrushSize] = useState(28);
+  const [erasePaths, setErasePaths] = useState<ErasePath[]>([]);
+  const [eraseRedoPaths, setEraseRedoPaths] = useState<ErasePath[]>([]);
 
   // Helper to access current slides from history
   const currentSlides = historyIndex >= 0 ? history[historyIndex] : [];
@@ -53,6 +64,87 @@ const App: React.FC = () => {
     newHistory.push(newSlides);
     setHistory(newHistory);
     setHistoryIndex(newHistory.length - 1);
+  };
+
+  const resetEraseMode = () => {
+    setIsEraseMode(false);
+    setEraseTool('add');
+    setErasePaths([]);
+    setEraseRedoPaths([]);
+  };
+
+  const cloneSlideWithOverlays = (slide: SlideData): SlideData => ({
+    ...slide,
+    overlays: slide.overlays.map((overlay) => ({ ...overlay, rect: { ...overlay.rect } })),
+  });
+
+  const renderEraseMaskData = (slide: SlideData, paths: ErasePath[]): Uint8ClampedArray => {
+    const canvas = document.createElement('canvas');
+    canvas.width = slide.width;
+    canvas.height = slide.height;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return new Uint8ClampedArray(slide.width * slide.height);
+
+    paths.forEach((path) => {
+      if (path.points.length === 0) return;
+      ctx.save();
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.lineWidth = path.size;
+      ctx.strokeStyle = '#ffffff';
+      ctx.globalCompositeOperation = path.mode === 'add' ? 'source-over' : 'destination-out';
+      ctx.beginPath();
+      ctx.moveTo(path.points[0].x, path.points[0].y);
+      for (let i = 1; i < path.points.length; i++) {
+        ctx.lineTo(path.points[i].x, path.points[i].y);
+      }
+      if (path.points.length === 1) {
+        ctx.arc(path.points[0].x, path.points[0].y, path.size / 2, 0, Math.PI * 2);
+      }
+      ctx.stroke();
+      ctx.restore();
+    });
+
+    const imageData = ctx.getImageData(0, 0, slide.width, slide.height).data;
+    const alpha = new Uint8ClampedArray(slide.width * slide.height);
+    for (let i = 0; i < alpha.length; i++) {
+      alpha[i] = imageData[i * 4 + 3];
+    }
+    return alpha;
+  };
+
+  const cropImageDataUrl = async (sourceDataUrl: string, rect: Rect): Promise<string> => {
+    const img = await loadImage(sourceDataUrl);
+    const canvas = document.createElement('canvas');
+    canvas.width = rect.width;
+    canvas.height = rect.height;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) throw new Error('Canvas context unavailable.');
+    ctx.drawImage(
+      img,
+      rect.x,
+      rect.y,
+      rect.width,
+      rect.height,
+      0,
+      0,
+      rect.width,
+      rect.height
+    );
+    return canvas.toDataURL('image/png');
+  };
+
+  const pasteImageDataUrl = async (baseDataUrl: string, patchDataUrl: string, rect: Rect): Promise<string> => {
+    const base = await loadImage(baseDataUrl);
+    const patch = await loadImage(patchDataUrl);
+    const canvas = document.createElement('canvas');
+    canvas.width = base.width;
+    canvas.height = base.height;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) throw new Error('Canvas context unavailable.');
+    ctx.drawImage(base, 0, 0);
+    ctx.drawImage(patch, rect.x, rect.y, rect.width, rect.height);
+    return canvas.toDataURL('image/png');
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -85,6 +177,7 @@ const App: React.FC = () => {
       setHistoryIndex(0);
       setActiveSlideIdx(0);
       setSelectedOverlayId(null);
+      resetEraseMode();
     } catch (err) {
       console.error(err);
       alert('파일 변환 중 오류가 발생했습니다.');
@@ -161,6 +254,30 @@ const App: React.FC = () => {
     updateHistory(newSlides);
   };
 
+  const handleErasePathCommit = (path: ErasePath) => {
+    if (path.points.length === 0) return;
+    setErasePaths((prev) => [...prev, path]);
+    setEraseRedoPaths([]);
+  };
+
+  const handleEraseUndo = () => {
+    setErasePaths((prev) => {
+      if (prev.length === 0) return prev;
+      const last = prev[prev.length - 1];
+      setEraseRedoPaths((redo) => [...redo, last]);
+      return prev.slice(0, -1);
+    });
+  };
+
+  const handleEraseRedo = () => {
+    setEraseRedoPaths((prev) => {
+      if (prev.length === 0) return prev;
+      const restored = prev[prev.length - 1];
+      setErasePaths((paths) => [...paths, restored]);
+      return prev.slice(0, -1);
+    });
+  };
+
   const handleUndo = useCallback(() => {
     if (historyIndex > 0) {
       setHistoryIndex(prev => prev - 1);
@@ -181,6 +298,7 @@ const App: React.FC = () => {
     );
     updateHistory(newSlides);
     setSelectedOverlayId(null);
+    resetEraseMode();
   };
 
   const handleDeleteSelectedOverlay = useCallback(() => {
@@ -205,10 +323,12 @@ const App: React.FC = () => {
       if (isInput) return;
 
       if ((e.metaKey || e.ctrlKey) && e.key === 'z') {
-        if (e.shiftKey) {
-          handleRedo();
+        if (isEraseMode) {
+          if (e.shiftKey) handleEraseRedo();
+          else handleEraseUndo();
         } else {
-          handleUndo();
+          if (e.shiftKey) handleRedo();
+          else handleUndo();
         }
         e.preventDefault();
         return;
@@ -221,7 +341,7 @@ const App: React.FC = () => {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleUndo, handleRedo, handleDeleteSelectedOverlay, selectedOverlayId]);
+  }, [handleUndo, handleRedo, handleDeleteSelectedOverlay, selectedOverlayId, isEraseMode]);
 
   const handleDownloadImages = async () => {
     if (currentSlides.length === 0) return;
@@ -288,6 +408,16 @@ const App: React.FC = () => {
     }
     setSelection(null);
     setSelectedOverlayId(null);
+    resetEraseMode();
+  };
+
+  const handleSlideDuplicate = (index: number) => {
+    const result = duplicateSlideAtIndex(currentSlides, index);
+    updateHistory(result.slides);
+    setActiveSlideIdx(result.insertedIndex);
+    setSelection(null);
+    setSelectedOverlayId(null);
+    resetEraseMode();
   };
 
   const handleSlideReorder = (fromIndex: number, toIndex: number) => {
@@ -303,9 +433,68 @@ const App: React.FC = () => {
     } else if (activeSlideIdx < fromIndex && activeSlideIdx >= toIndex) {
       setActiveSlideIdx(activeSlideIdx + 1);
     }
+    resetEraseMode();
   };
 
-  const handleRemoveText = async () => {
+  const handleStartEraseMode = () => {
+    if (currentSlides.length === 0) return;
+    setIsEraseMode(true);
+    setEraseTool('add');
+    setErasePaths([]);
+    setEraseRedoPaths([]);
+    setSelection(null);
+    setSelectedOverlayId(null);
+  };
+
+  const handleApplyEraseMode = async () => {
+    if (currentSlides.length === 0) return;
+    if (erasePaths.length === 0) {
+      alert('지울 영역을 먼저 칠해 주세요.');
+      return;
+    }
+
+    setIsProcessing(true);
+    try {
+      const currentSlide = currentSlides[activeSlideIdx];
+      const mask = renderEraseMaskData(currentSlide, erasePaths);
+      const minPixels = Math.max(120, Math.round((eraseBrushSize * eraseBrushSize) / 3));
+      const targetRects = extractConnectedMaskRects(mask, currentSlide.width, currentSlide.height, minPixels);
+
+      if (targetRects.length === 0) {
+        alert('지울 영역이 충분히 선택되지 않았습니다. 영역을 조금 더 넓게 칠해 주세요.');
+        return;
+      }
+
+      let workingDataUrl = currentSlide.dataUrl;
+      for (const rect of targetRects) {
+        const cropped = await cropImageDataUrl(workingDataUrl, rect);
+        const cleaned = await removeTextFromImage(cropped);
+        if (cleaned) {
+          workingDataUrl = await pasteImageDataUrl(workingDataUrl, cleaned, rect);
+        }
+      }
+
+      const withOriginalCopy = duplicateSlideAtIndex(currentSlides, activeSlideIdx).slides;
+      withOriginalCopy[activeSlideIdx] = {
+        ...withOriginalCopy[activeSlideIdx],
+        dataUrl: workingDataUrl,
+        overlays: [],
+      };
+
+      updateHistory(withOriginalCopy);
+      setSelection(null);
+      setSelectedOverlayId(null);
+      resetEraseMode();
+    } catch (error: any) {
+      console.error(error);
+      const errorMsg = error?.message || error?.toString() || '알 수 없는 오류';
+      alert(`영역 텍스트 제거에 실패했습니다.\n\n오류 상세: ${errorMsg}`);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleRemoveTextAll = async () => {
     if (currentSlides.length === 0) return;
     if (!window.confirm("현재 슬라이드의 모든 텍스트를 제거하고 배경을 복원하시겠습니까?\n이 작업은 약 5~10초 정도 소요됩니다.")) return;
 
@@ -315,12 +504,15 @@ const App: React.FC = () => {
       const cleanImage = await removeAllTextFromSlide(currentSlide.dataUrl);
 
       if (cleanImage) {
+        const originalCopy = cloneSlideWithOverlays(currentSlide);
         const newSlides = currentSlides.map((s, idx) =>
           idx === activeSlideIdx ? { ...s, dataUrl: cleanImage, overlays: [] } : s
         );
+        newSlides.splice(activeSlideIdx + 1, 0, originalCopy);
         updateHistory(newSlides);
         setSelection(null);
         setSelectedOverlayId(null);
+        resetEraseMode();
       } else {
         alert("텍스트 제거에 실패했습니다. AI 모델 응답이 비어있습니다.");
       }
@@ -392,12 +584,25 @@ const App: React.FC = () => {
           </label>
 
           <button
-            onClick={handleRemoveText}
+            onClick={handleStartEraseMode}
+            disabled={currentSlides.length === 0 || isProcessing}
+            className="flex items-center gap-2 px-4 py-2 disabled:opacity-50 rounded-lg text-sm font-medium border transition-colors"
+            style={{
+              backgroundColor: isEraseMode ? theme.primaryButtonBg : theme.neutralButtonBg,
+              color: isEraseMode ? theme.primaryButtonText : theme.neutralButtonText,
+              borderColor: isEraseMode ? theme.primaryButtonBg : theme.headerBorder
+            }}
+          >
+            <Paintbrush size={18} /><span>텍스트 제거</span>
+          </button>
+
+          <button
+            onClick={handleRemoveTextAll}
             disabled={currentSlides.length === 0 || isProcessing}
             className="flex items-center gap-2 px-4 py-2 disabled:opacity-50 rounded-lg text-sm font-medium border transition-colors"
             style={{ backgroundColor: theme.neutralButtonBg, color: theme.neutralButtonText, borderColor: theme.headerBorder }}
           >
-            <Eraser size={18} /><span>{isProcessing ? '처리 중...' : '텍스트 제거'}</span>
+            <Eraser size={18} /><span>{isProcessing ? '처리 중...' : '텍스트 전체 제거'}</span>
           </button>
 
           <div className="w-px h-6 mx-2" style={{ backgroundColor: theme.headerBorder }}></div>
@@ -434,8 +639,14 @@ const App: React.FC = () => {
           <SlidePanel
             slides={currentSlides}
             activeSlideIdx={activeSlideIdx}
-            onSlideSelect={(idx) => { setActiveSlideIdx(idx); setSelection(null); setSelectedOverlayId(null); }}
+            onSlideSelect={(idx) => {
+              setActiveSlideIdx(idx);
+              setSelection(null);
+              setSelectedOverlayId(null);
+              resetEraseMode();
+            }}
             onSlideDelete={handleSlideDelete}
+            onSlideDuplicate={handleSlideDuplicate}
             onSlideReorder={handleSlideReorder}
             isCollapsed={slidePanelCollapsed}
             onToggleCollapse={() => setSlidePanelCollapsed(prev => !prev)}
@@ -481,6 +692,48 @@ const App: React.FC = () => {
         </aside>
 
         <div className="flex-1 flex flex-col relative" style={{ backgroundColor: theme.mainCanvasBg }}>
+          {isEraseMode && currentSlides.length > 0 && (
+            <div className="absolute top-3 right-3 z-30 flex items-center gap-2 bg-white/95 border border-slate-200 rounded-xl px-3 py-2 shadow-lg backdrop-blur-sm">
+              <span className="text-xs font-semibold text-slate-600">지우개 모드</span>
+              <button
+                onClick={() => setEraseTool('add')}
+                className="px-2 py-1 rounded-md text-xs font-semibold border"
+                style={{ backgroundColor: eraseTool === 'add' ? '#e8edff' : '#ffffff', color: '#374151', borderColor: '#dbe3f0' }}
+              >
+                추가
+              </button>
+              <button
+                onClick={() => setEraseTool('remove')}
+                className="px-2 py-1 rounded-md text-xs font-semibold border"
+                style={{ backgroundColor: eraseTool === 'remove' ? '#fee2e2' : '#ffffff', color: '#374151', borderColor: '#f3d1d1' }}
+              >
+                취소
+              </button>
+              <input
+                type="range"
+                min={12}
+                max={72}
+                value={eraseBrushSize}
+                onChange={(e) => setEraseBrushSize(Number(e.target.value))}
+              />
+              <span className="text-xs text-slate-500 w-8">{eraseBrushSize}</span>
+              <button onClick={handleEraseUndo} disabled={erasePaths.length === 0} className="p-1 rounded text-slate-600 disabled:opacity-40" title="지우개 되돌리기">
+                <Undo2 size={16} />
+              </button>
+              <button onClick={handleEraseRedo} disabled={eraseRedoPaths.length === 0} className="p-1 rounded text-slate-600 disabled:opacity-40" title="지우개 다시하기">
+                <Redo2 size={16} />
+              </button>
+              <button onClick={() => { setErasePaths([]); setEraseRedoPaths([]); }} className="p-1 rounded text-slate-600" title="영역 초기화">
+                <CircleOff size={16} />
+              </button>
+              <button onClick={handleApplyEraseMode} className="px-2 py-1 rounded-md text-xs font-semibold bg-indigo-600 text-white flex items-center gap-1">
+                <Check size={14} /> 적용
+              </button>
+              <button onClick={resetEraseMode} className="px-2 py-1 rounded-md text-xs font-semibold border border-slate-300 text-slate-700 flex items-center gap-1">
+                <X size={14} /> 닫기
+              </button>
+            </div>
+          )}
           {isProcessing ? (
             <div className="flex-1 flex flex-col items-center justify-center gap-4">
               <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
@@ -492,6 +745,11 @@ const App: React.FC = () => {
               selectedOverlayId={selectedOverlayId}
               draftOverlay={draftOverlay}
               isDark={theme.isDark}
+              isEraseMode={isEraseMode}
+              eraseTool={eraseTool}
+              eraseBrushSize={eraseBrushSize}
+              erasePaths={erasePaths}
+              onErasePathCommit={handleErasePathCommit}
               onSelectionChange={(rect) => { setSelection(rect); if (rect) setSelectedOverlayId(null); }}
               onOverlaySelect={setSelectedOverlayId}
               onUpdateOverlays={handleUpdateOverlays}

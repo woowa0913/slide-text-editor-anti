@@ -44,6 +44,12 @@ export interface SlideData {
   overlays: TextOverlay[];
 }
 
+export interface ErasePath {
+  mode: 'add' | 'remove';
+  size: number;
+  points: Point[];
+}
+
 export type HandleType = 'nw' | 'n' | 'ne' | 'e' | 'se' | 's' | 'sw' | 'w' | 'rotate';
 
 export interface OCRResult {
