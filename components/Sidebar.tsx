@@ -82,6 +82,26 @@ const Sidebar: React.FC<SidebarProps> = ({
     borderColor: isDark ? '#1f2430' : '#e5e7eb',
     color: isDark ? '#d1d5db' : '#1f2937'
   };
+  const sectionStyle = {
+    backgroundColor: isDark ? 'rgba(30, 41, 59, 0.5)' : '#f8fafc',
+    borderColor: isDark ? '#334155' : '#e2e8f0'
+  };
+  const fieldStyle = {
+    backgroundColor: isDark ? '#0f172a' : '#ffffff',
+    borderColor: isDark ? '#334155' : '#cbd5e1',
+    color: isDark ? '#e2e8f0' : '#1f2937'
+  };
+  const subtleTextColor = isDark ? '#94a3b8' : '#64748b';
+  const mutedTextColor = isDark ? '#9ca3af' : '#6b7280';
+  const inactiveButtonColor = isDark ? '#64748b' : '#94a3b8';
+  const activeSegmentStyle = {
+    backgroundColor: isDark ? '#334155' : '#e8edff',
+    color: '#4f46e5'
+  };
+  const neutralActionButtonStyle = {
+    backgroundColor: isDark ? '#334155' : '#eef2ff',
+    color: isDark ? '#ffffff' : '#1f2937'
+  };
 
   // Sync draft state for live preview when selection exists but not editing
   useEffect(() => {
@@ -542,8 +562,8 @@ const Sidebar: React.FC<SidebarProps> = ({
       ) : (
         <div className="space-y-6">
           {!isEditing && (
-            <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
-              <h3 className="text-xs font-medium text-slate-400 uppercase tracking-wider mb-3">AI 텍스트 분석</h3>
+            <div className="rounded-xl p-4 border" style={sectionStyle}>
+              <h3 className="text-xs font-medium uppercase tracking-wider mb-3" style={{ color: subtleTextColor }}>AI 텍스트 분석</h3>
               {isAnalyzing ? (
                 <div className="flex items-center gap-3 py-4 text-blue-400">
                   <Loader2 className="animate-spin" size={18} />
@@ -551,12 +571,13 @@ const Sidebar: React.FC<SidebarProps> = ({
                 </div>
               ) : ocrResult ? (
                 <div className="space-y-3">
-                  <div className="p-3 bg-slate-900 rounded text-sm text-slate-300 italic border border-slate-800">"{ocrResult.text}"</div>
+                  <div className="p-3 rounded text-sm italic border" style={{ ...fieldStyle, color: mutedTextColor }}>"{ocrResult.text}"</div>
                 </div>
               ) : (
                 <button
                   onClick={handleAnalyze}
-                  className="w-full bg-slate-700 hover:bg-slate-600 text-white text-xs font-bold py-3 rounded-lg flex items-center justify-center gap-2 transition-all"
+                  className="w-full text-xs font-bold py-3 rounded-lg flex items-center justify-center gap-2 transition-all"
+                  style={neutralActionButtonStyle}
                 >
                   <Sparkles size={14} className="text-blue-400" /> AI 분석 (OCR) 실행
                 </button>
@@ -567,7 +588,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           <div className="space-y-4">
             <div className="space-y-2">
               <div className="flex justify-between items-center">
-                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest">내용</label>
+                <label className="block text-[10px] font-bold uppercase tracking-widest" style={{ color: subtleTextColor }}>내용</label>
                 <button
                   onClick={handleAiSuggest}
                   disabled={isSuggesting || (!replacementText && !ocrResult)}
@@ -583,39 +604,41 @@ const Sidebar: React.FC<SidebarProps> = ({
                   setReplacementText(e.target.value);
                   if (isEditing) updateSelectedOverlay({ newText: e.target.value });
                 }}
-                className="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-sm h-24 resize-none focus:outline-none focus:border-blue-500 text-slate-200 placeholder-slate-600"
+                className="w-full border rounded-lg p-3 text-sm h-24 resize-none focus:outline-none focus:border-blue-500 placeholder-slate-400"
+                style={fieldStyle}
                 placeholder={ocrResult ? "텍스트를 입력하세요" : "OCR 분석을 먼저 실행하세요"}
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest">수평 정렬</label>
-                <div className="flex bg-slate-900 p-1 rounded-lg border border-slate-800">
-                  <button onClick={() => { setHAlign('left'); if (isEditing) updateSelectedOverlay({ hAlign: 'left' }); }} className={`flex-1 p-1.5 rounded flex justify-center ${hAlign === 'left' ? 'bg-slate-700 text-blue-400' : 'text-slate-500'}`}><AlignLeft size={16} /></button>
-                  <button onClick={() => { setHAlign('center'); if (isEditing) updateSelectedOverlay({ hAlign: 'center' }); }} className={`flex-1 p-1.5 rounded flex justify-center ${hAlign === 'center' ? 'bg-slate-700 text-blue-400' : 'text-slate-500'}`}><AlignCenter size={16} /></button>
-                  <button onClick={() => { setHAlign('right'); if (isEditing) updateSelectedOverlay({ hAlign: 'right' }); }} className={`flex-1 p-1.5 rounded flex justify-center ${hAlign === 'right' ? 'bg-slate-700 text-blue-400' : 'text-slate-500'}`}><AlignRight size={16} /></button>
+                <label className="block text-[10px] font-bold uppercase tracking-widest" style={{ color: subtleTextColor }}>수평 정렬</label>
+                <div className="flex p-1 rounded-lg border" style={fieldStyle}>
+                  <button onClick={() => { setHAlign('left'); if (isEditing) updateSelectedOverlay({ hAlign: 'left' }); }} className="flex-1 p-1.5 rounded flex justify-center" style={hAlign === 'left' ? activeSegmentStyle : { color: inactiveButtonColor }}><AlignLeft size={16} /></button>
+                  <button onClick={() => { setHAlign('center'); if (isEditing) updateSelectedOverlay({ hAlign: 'center' }); }} className="flex-1 p-1.5 rounded flex justify-center" style={hAlign === 'center' ? activeSegmentStyle : { color: inactiveButtonColor }}><AlignCenter size={16} /></button>
+                  <button onClick={() => { setHAlign('right'); if (isEditing) updateSelectedOverlay({ hAlign: 'right' }); }} className="flex-1 p-1.5 rounded flex justify-center" style={hAlign === 'right' ? activeSegmentStyle : { color: inactiveButtonColor }}><AlignRight size={16} /></button>
                 </div>
               </div>
               <div className="space-y-2">
-                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest">수직 정렬</label>
-                <div className="flex bg-slate-900 p-1 rounded-lg border border-slate-800">
-                  <button onClick={() => { setVAlign('top'); if (isEditing) updateSelectedOverlay({ vAlign: 'top' }); }} className={`flex-1 p-1.5 rounded flex justify-center ${vAlign === 'top' ? 'bg-slate-700 text-blue-400' : 'text-slate-500'}`} title="위쪽"><AlignVerticalJustifyStart size={16} /></button>
-                  <button onClick={() => { setVAlign('middle'); if (isEditing) updateSelectedOverlay({ vAlign: 'middle' }); }} className={`flex-1 p-1.5 rounded flex justify-center ${vAlign === 'middle' ? 'bg-slate-700 text-blue-400' : 'text-slate-500'}`} title="가운데"><AlignVerticalJustifyCenter size={16} /></button>
-                  <button onClick={() => { setVAlign('bottom'); if (isEditing) updateSelectedOverlay({ vAlign: 'bottom' }); }} className={`flex-1 p-1.5 rounded flex justify-center ${vAlign === 'bottom' ? 'bg-slate-700 text-blue-400' : 'text-slate-500'}`} title="아래쪽"><AlignVerticalJustifyEnd size={16} /></button>
+                <label className="block text-[10px] font-bold uppercase tracking-widest" style={{ color: subtleTextColor }}>수직 정렬</label>
+                <div className="flex p-1 rounded-lg border" style={fieldStyle}>
+                  <button onClick={() => { setVAlign('top'); if (isEditing) updateSelectedOverlay({ vAlign: 'top' }); }} className="flex-1 p-1.5 rounded flex justify-center" style={vAlign === 'top' ? activeSegmentStyle : { color: inactiveButtonColor }} title="위쪽"><AlignVerticalJustifyStart size={16} /></button>
+                  <button onClick={() => { setVAlign('middle'); if (isEditing) updateSelectedOverlay({ vAlign: 'middle' }); }} className="flex-1 p-1.5 rounded flex justify-center" style={vAlign === 'middle' ? activeSegmentStyle : { color: inactiveButtonColor }} title="가운데"><AlignVerticalJustifyCenter size={16} /></button>
+                  <button onClick={() => { setVAlign('bottom'); if (isEditing) updateSelectedOverlay({ vAlign: 'bottom' }); }} className="flex-1 p-1.5 rounded flex justify-center" style={vAlign === 'bottom' ? activeSegmentStyle : { color: inactiveButtonColor }} title="아래쪽"><AlignVerticalJustifyEnd size={16} /></button>
                 </div>
               </div>
             </div>
 
             <div className="space-y-2">
-              <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest">글꼴</label>
+              <label className="block text-[10px] font-bold uppercase tracking-widest" style={{ color: subtleTextColor }}>글꼴</label>
               <select
                 value={fontFamily}
                 onChange={(e) => {
                   setFontFamily(e.target.value);
                   if (isEditing) updateSelectedOverlay({ fontFamily: e.target.value });
                 }}
-                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-blue-500"
+                className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
+                style={fieldStyle}
               >
                 {FONTS.map(f => <option key={f.value} value={f.value}>{f.name}</option>)}
               </select>
@@ -623,7 +646,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-widest">크기</label>
+                <label className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest" style={{ color: subtleTextColor }}>크기</label>
                 <input
                   type="number"
                   value={fontSize}
@@ -632,12 +655,13 @@ const Sidebar: React.FC<SidebarProps> = ({
                     setFontSize(val);
                     if (isEditing) updateSelectedOverlay({ fontSize: val });
                   }}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
+                  className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
+                  style={fieldStyle}
                 />
               </div>
               <div className="space-y-2">
-                <label className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-widest">글자 색상</label>
-                <div className="flex gap-2 items-center bg-slate-900 border border-slate-700 rounded-lg px-2 py-1">
+                <label className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest" style={{ color: subtleTextColor }}>글자 색상</label>
+                <div className="flex gap-2 items-center border rounded-lg px-2 py-1" style={fieldStyle}>
                   <input
                     type="color"
                     value={fontColor}
@@ -647,13 +671,13 @@ const Sidebar: React.FC<SidebarProps> = ({
                     }}
                     className="w-8 h-8 bg-transparent cursor-pointer"
                   />
-                  <span className="text-[10px] font-mono text-slate-400 uppercase">{fontColor}</span>
+                  <span className="text-[10px] font-mono uppercase" style={{ color: subtleTextColor }}>{fontColor}</span>
                 </div>
               </div>
             </div>
 
             <div className="space-y-2">
-              <label className="flex items-center justify-between text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">
+              <label className="flex items-center justify-between text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: subtleTextColor }}>
                 <span>배경 (Background)</span>
                 <div className="flex items-center gap-2">
                   <button
@@ -686,7 +710,8 @@ const Sidebar: React.FC<SidebarProps> = ({
 
               {backgroundImage && (
                 <div
-                  className="mb-2 relative w-full h-12 rounded-lg border border-slate-700 overflow-hidden bg-slate-900 cursor-pointer hover:ring-1 hover:ring-blue-500 transition-all"
+                  className="mb-2 relative w-full h-12 rounded-lg border overflow-hidden cursor-pointer hover:ring-1 hover:ring-blue-500 transition-all"
+                  style={fieldStyle}
                   onClick={() => {
                     // Clicking thumbnail ensures background image is active (redundant but gives feedback)
                     if (backgroundImage) setBackgroundImage(backgroundImage);
@@ -696,7 +721,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                 </div>
               )}
 
-              <div className="flex items-center justify-between bg-slate-900 border border-slate-700 rounded-lg px-3 py-2">
+              <div className="flex items-center justify-between border rounded-lg px-3 py-2" style={fieldStyle}>
                 <div className="flex items-center gap-3">
                   <div className="relative flex items-center">
                     <input
@@ -711,9 +736,9 @@ const Sidebar: React.FC<SidebarProps> = ({
                       }}
                       className={`w-6 h-6 bg-transparent border-none p-0 cursor-pointer ${isTransparent ? 'opacity-20 cursor-not-allowed' : ''}`}
                     />
-                    {isTransparent && <div className="absolute inset-0 bg-slate-900/50 pointer-events-none" />}
+                    {isTransparent && <div className="absolute inset-0 pointer-events-none" style={{ backgroundColor: isDark ? 'rgba(15,23,42,0.5)' : 'rgba(248,250,252,0.75)' }} />}
                   </div>
-                  <span className={`text-xs font-mono uppercase ${isTransparent ? 'text-slate-600' : 'text-slate-300'}`}>
+                  <span className="text-xs font-mono uppercase" style={{ color: isTransparent ? '#94a3b8' : mutedTextColor }}>
                     {backgroundColor}
                   </span>
                 </div>
@@ -736,35 +761,38 @@ const Sidebar: React.FC<SidebarProps> = ({
                         });
                       }
                     }}
-                    className="w-4 h-4 rounded border-slate-600 bg-slate-800 text-blue-600 focus:ring-0 focus:ring-offset-0 transition-colors group-hover:border-slate-500"
+                    className="w-4 h-4 rounded text-blue-600 focus:ring-0 focus:ring-offset-0 transition-colors group-hover:border-slate-500"
+                    style={{ backgroundColor: isDark ? '#1e293b' : '#ffffff', borderColor: isDark ? '#475569' : '#cbd5e1' }}
                   />
-                  <span className="text-xs text-slate-400 group-hover:text-slate-300 transition-colors">투명</span>
+                  <span className="text-xs group-hover:text-slate-500 transition-colors" style={{ color: mutedTextColor }}>투명</span>
                 </label>
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-widest">두께</label>
-                <div className="flex p-1 bg-slate-900 rounded-lg border border-slate-800">
+                <label className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest" style={{ color: subtleTextColor }}>두께</label>
+                <div className="flex p-1 rounded-lg border" style={fieldStyle}>
                   <button
                     onClick={() => { setFontWeight('normal'); if (isEditing) updateSelectedOverlay({ fontWeight: 'normal' }); }}
-                    className={`flex-1 py-1.5 text-xs rounded transition-all ${fontWeight === 'normal' ? 'bg-slate-700 text-white' : 'text-slate-500'}`}
+                    className="flex-1 py-1.5 text-xs rounded transition-all"
+                    style={fontWeight === 'normal' ? activeSegmentStyle : { color: inactiveButtonColor }}
                   >
                     Normal
                   </button>
                   <button
                     onClick={() => { setFontWeight('bold'); if (isEditing) updateSelectedOverlay({ fontWeight: 'bold' }); }}
-                    className={`flex-1 py-1.5 text-xs font-bold rounded transition-all ${fontWeight === 'bold' ? 'bg-slate-700 text-white' : 'text-slate-500'}`}
+                    className="flex-1 py-1.5 text-xs font-bold rounded transition-all"
+                    style={fontWeight === 'bold' ? activeSegmentStyle : { color: inactiveButtonColor }}
                   >
                     Bold
                   </button>
                 </div>
               </div>
               <div className="space-y-2">
-                <label className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-widest">자간 (Spacing)</label>
-                <div className="flex items-center bg-slate-900 border border-slate-700 rounded-lg px-2">
-                  <MoveHorizontal size={14} className="text-slate-500 mr-2" />
+                <label className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest" style={{ color: subtleTextColor }}>자간 (Spacing)</label>
+                <div className="flex items-center border rounded-lg px-2" style={fieldStyle}>
+                  <MoveHorizontal size={14} className="mr-2" style={{ color: mutedTextColor }} />
                   <input
                     type="number"
                     step="0.1"
@@ -794,7 +822,8 @@ const Sidebar: React.FC<SidebarProps> = ({
                   <button
                     onClick={() => handleApply(true)}
                     disabled={!selection}
-                    className="w-full bg-slate-700 hover:bg-slate-600 disabled:opacity-50 text-slate-200 font-bold py-3 rounded-lg flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-all border border-slate-600"
+                    className="w-full disabled:opacity-50 font-bold py-3 rounded-lg flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-all border"
+                    style={{ ...neutralActionButtonStyle, borderColor: isDark ? '#475569' : '#dbe3f0' }}
                     title="적용 후 선택 영역 유지 (워터마크 제거 등 반복 작업용)"
                   >
                     <CopyPlus size={18} /> 반복 적용
