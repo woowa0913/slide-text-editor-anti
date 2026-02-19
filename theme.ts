@@ -66,15 +66,12 @@ export const getThemeByMode = (mode: ThemeMode): ThemePalette =>
 export const toggleThemeMode = (mode: ThemeMode): ThemeMode =>
   mode === 'stripe' ? 'linearDark' : 'stripe';
 
-const KT_CLOUD_LOGO_IDS = {
-  positive: '1SBE1xX6Hym5e_FuVeDsWRZyIhlCh_iuD',
-  negative: '1SRulx9AmknWoL8TlXbpFMOQOI85JtHgb',
+const KT_CLOUD_LOGO_PATHS = {
+  positive: '/branding/kt-cloud-basic-logo-positive.png',
+  negative: '/branding/kt-cloud-basic-logo-negative.png',
 } as const;
-
-const toDriveImageUrl = (fileId: string): string =>
-  `https://drive.google.com/uc?export=view&id=${fileId}`;
 
 export const getKtCloudLogoByMode = (mode: ThemeMode): string =>
   mode === 'linearDark'
-    ? toDriveImageUrl(KT_CLOUD_LOGO_IDS.negative)
-    : toDriveImageUrl(KT_CLOUD_LOGO_IDS.positive);
+    ? KT_CLOUD_LOGO_PATHS.negative
+    : KT_CLOUD_LOGO_PATHS.positive;

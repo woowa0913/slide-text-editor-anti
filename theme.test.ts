@@ -25,7 +25,7 @@ describe('theme mode helpers', () => {
     const lightLogo = getKtCloudLogoByMode('stripe');
     const darkLogo = getKtCloudLogoByMode('linearDark');
 
-    expect(lightLogo).toContain('1SBE1xX6Hym5e_FuVeDsWRZyIhlCh_iuD');
-    expect(darkLogo).toContain('1SRulx9AmknWoL8TlXbpFMOQOI85JtHgb');
+    expect(lightLogo).toBe('/branding/kt-cloud-basic-logo-positive.png');
+    expect(darkLogo).toBe('/branding/kt-cloud-basic-logo-negative.png');
   });
 });
