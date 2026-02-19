@@ -11,6 +11,7 @@ interface SlidePanelProps {
     onSlideReorder: (fromIndex: number, toIndex: number) => void;
     isCollapsed: boolean;
     onToggleCollapse: () => void;
+    isDark: boolean;
 }
 
 const SlidePanel: React.FC<SlidePanelProps> = ({
@@ -21,6 +22,7 @@ const SlidePanel: React.FC<SlidePanelProps> = ({
     onSlideReorder,
     isCollapsed,
     onToggleCollapse,
+    isDark,
 }) => {
     const [dragOverIdx, setDragOverIdx] = useState<number | null>(null);
     const [draggingIdx, setDraggingIdx] = useState<number | null>(null);
@@ -74,18 +76,27 @@ const SlidePanel: React.FC<SlidePanelProps> = ({
             {/* Toggle Button */}
             <button
                 onClick={onToggleCollapse}
-                className="absolute -right-4 top-1/2 -translate-y-1/2 z-20 w-4 h-10 bg-slate-700 hover:bg-slate-600 border border-slate-600 rounded-r-md flex items-center justify-center transition-colors"
+                className="absolute -right-4 top-1/2 -translate-y-1/2 z-20 w-4 h-10 border rounded-r-md flex items-center justify-center transition-colors"
+                style={{
+                    backgroundColor: isDark ? '#1a1f2a' : '#eef0ff',
+                    borderColor: isDark ? '#1f2430' : '#e5e7eb'
+                }}
                 title={isCollapsed ? "슬라이드 패널 열기" : "슬라이드 패널 닫기"}
             >
-                {isCollapsed ? <ChevronRight size={12} className="text-slate-300" /> : <ChevronLeft size={12} className="text-slate-300" />}
+                {isCollapsed
+                    ? <ChevronRight size={12} style={{ color: isDark ? '#d1d5db' : '#4b5563' }} />
+                    : <ChevronLeft size={12} style={{ color: isDark ? '#d1d5db' : '#4b5563' }} />}
             </button>
 
             {/* Panel Content */}
-            <div className={`w-48 border-r border-slate-800 bg-[#111827] flex flex-col overflow-hidden ${isCollapsed ? 'hidden' : ''}`}>
+            <div
+                className={`w-48 border-r flex flex-col overflow-hidden ${isCollapsed ? 'hidden' : ''}`}
+                style={{ borderColor: isDark ? '#1f2430' : '#e5e7eb', backgroundColor: isDark ? '#0f131a' : '#ffffff' }}
+            >
                 {/* Header */}
-                <div className="px-3 py-3 border-b border-slate-800 flex items-center justify-between shrink-0">
-                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">슬라이드</span>
-                    <span className="text-xs font-mono text-slate-500">{slides.length}장</span>
+                <div className="px-3 py-3 border-b flex items-center justify-between shrink-0" style={{ borderColor: isDark ? '#1f2430' : '#e5e7eb' }}>
+                    <span className="text-xs font-bold uppercase tracking-wider" style={{ color: isDark ? '#9ca3af' : '#6b7280' }}>슬라이드</span>
+                    <span className="text-xs font-mono" style={{ color: isDark ? '#6b7280' : '#9ca3af' }}>{slides.length}장</span>
                 </div>
 
                 {/* Slide List */}
@@ -103,14 +114,18 @@ const SlidePanel: React.FC<SlidePanelProps> = ({
                             className={`
                 group relative rounded-lg overflow-hidden cursor-pointer transition-all duration-150
                 ${activeSlideIdx === index
-                                    ? 'ring-2 ring-blue-500 ring-offset-1 ring-offset-[#111827] shadow-lg shadow-blue-900/20'
-                                    : 'ring-1 ring-slate-700 hover:ring-slate-500'}
+                                    ? isDark
+                                        ? 'ring-2 ring-indigo-500 ring-offset-1 ring-offset-[#0f131a] shadow-lg shadow-indigo-950/20'
+                                        : 'ring-2 ring-[#635bff] ring-offset-1 ring-offset-[#ffffff] shadow-lg shadow-indigo-200/40'
+                                    : isDark
+                                        ? 'ring-1 ring-slate-700 hover:ring-slate-500'
+                                        : 'ring-1 ring-slate-300 hover:ring-slate-400'}
                 ${dragOverIdx === index ? 'ring-2 ring-yellow-400 scale-[1.02]' : ''}
                 ${draggingIdx === index ? 'opacity-40' : 'opacity-100'}
               `}
                         >
                             {/* Slide Thumbnail */}
-                            <div className="relative aspect-[16/9] bg-slate-900">
+                            <div className="relative aspect-[16/9]" style={{ backgroundColor: isDark ? '#151923' : '#f4f6ff' }}>
                                 <img
                                     src={slide.dataUrl}
                                     alt={`Slide ${index + 1}`}
@@ -127,7 +142,7 @@ const SlidePanel: React.FC<SlidePanelProps> = ({
 
                                 {/* Drag handle (top-left) */}
                                 <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <GripVertical size={14} className="text-slate-400" />
+                                    <GripVertical size={14} style={{ color: isDark ? '#9ca3af' : '#6b7280' }} />
                                 </div>
 
                                 {/* Delete button (bottom-right) */}
@@ -143,8 +158,15 @@ const SlidePanel: React.FC<SlidePanelProps> = ({
                             </div>
 
                             {/* Slide number */}
-                            <div className={`text-center py-1 text-[10px] font-bold ${activeSlideIdx === index ? 'text-blue-400 bg-slate-800/50' : 'text-slate-500 bg-slate-900/50'
-                                }`}>
+                            <div
+                                className="text-center py-1 text-[10px] font-bold"
+                                style={{
+                                    color: activeSlideIdx === index
+                                        ? (isDark ? '#a5b4fc' : '#635bff')
+                                        : (isDark ? '#6b7280' : '#64748b'),
+                                    backgroundColor: isDark ? 'rgba(15, 19, 26, 0.7)' : 'rgba(241, 245, 249, 0.9)'
+                                }}
+                            >
                                 {index + 1}
                             </div>
                         </div>

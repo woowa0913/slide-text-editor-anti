@@ -22,8 +22,11 @@ import {
   Redo2,
   Image as ImageIcon,
   Plus,
-  Eraser
+  Eraser,
+  Moon,
+  Sun
 } from 'lucide-react';
+import { getKtCloudLogoByMode, getThemeByMode, toggleThemeMode, ThemeMode } from './theme';
 
 const App: React.FC = () => {
   // History State
@@ -35,12 +38,15 @@ const App: React.FC = () => {
   const [selectedOverlayId, setSelectedOverlayId] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [slidePanelCollapsed, setSlidePanelCollapsed] = useState(false);
+  const [themeMode, setThemeMode] = useState<ThemeMode>('stripe');
 
   // Draft overlay state for preview (lifted from Sidebar)
   const [draftOverlay, setDraftOverlay] = useState<Partial<TextOverlay> | null>(null);
 
   // Helper to access current slides from history
   const currentSlides = historyIndex >= 0 ? history[historyIndex] : [];
+  const theme = getThemeByMode(themeMode);
+  const ciLogoSrc = getKtCloudLogoByMode(themeMode);
 
   const updateHistory = (newSlides: SlideData[]) => {
     const newHistory = history.slice(0, historyIndex + 1);
@@ -328,8 +334,14 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-[#0f172a] text-slate-100 font-sans">
-      <header className="h-16 border-b border-slate-800 flex items-center justify-between px-6 bg-[#1e293b] shrink-0">
+    <div
+      className="flex flex-col h-screen font-sans"
+      style={{ backgroundColor: theme.appBg, color: theme.textPrimary }}
+    >
+      <header
+        className="h-16 border-b flex items-center justify-between px-6 shrink-0"
+        style={{ backgroundColor: theme.headerBg, borderColor: theme.headerBorder }}
+      >
         <div className="flex items-center gap-4">
           {/* 1. Square App Logo - Custom Icon */}
           <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center shadow-lg shadow-blue-900/20 ring-1 ring-white/10">
@@ -343,20 +355,38 @@ const App: React.FC = () => {
 
           {/* 2. KT Cloud Logo (White) */}
           <img
-            src="https://lh3.googleusercontent.com/d/1cg9YBFIuZtsnn_oekcN121ks_JnJPiX-"
+            src={ciLogoSrc}
             alt="KT Cloud Logo"
-            className="h-3.5 w-auto object-contain opacity-80"
+            className="h-3.5 w-auto object-contain"
           />
 
           {/* 3. Title */}
-          <h1 className="text-lg font-bold tracking-tight text-slate-100 ml-1">Slide AI Editor</h1>
+          <h1 className="text-lg font-bold tracking-tight ml-1" style={{ color: theme.textPrimary }}>Slide AI Editor</h1>
         </div>
         <div className="flex items-center gap-3">
-          <label className="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg cursor-pointer transition-colors text-sm font-medium border border-slate-600">
+          <button
+            onClick={() => setThemeMode(prev => toggleThemeMode(prev))}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border transition-colors"
+            style={{
+              backgroundColor: themeMode === 'linearDark' ? '#e5e7eb' : '#111827',
+              color: themeMode === 'linearDark' ? '#111827' : '#ffffff',
+              borderColor: themeMode === 'linearDark' ? '#d1d5db' : '#111827'
+            }}
+          >
+            {themeMode === 'linearDark' ? <Sun size={16} /> : <Moon size={16} />}
+            <span>{themeMode === 'linearDark' ? '라이트모드' : '야간모드'}</span>
+          </button>
+          <label
+            className="flex items-center gap-2 px-4 py-2 rounded-lg cursor-pointer transition-colors text-sm font-medium border"
+            style={{ backgroundColor: theme.neutralButtonBg, color: theme.neutralButtonText, borderColor: theme.headerBorder }}
+          >
             <FileUp size={18} /><span>파일 업로드</span>
             <input type="file" accept=".pdf,image/*" className="hidden" onChange={handleFileUpload} />
           </label>
-          <label className="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg cursor-pointer transition-colors text-sm font-medium border border-slate-600">
+          <label
+            className="flex items-center gap-2 px-4 py-2 rounded-lg cursor-pointer transition-colors text-sm font-medium border"
+            style={{ backgroundColor: theme.neutralButtonBg, color: theme.neutralButtonText, borderColor: theme.headerBorder }}
+          >
             <Plus size={18} /><span>이미지 추가</span>
             <input type="file" accept="image/*" className="hidden" onChange={handleAddImage} disabled={currentSlides.length === 0} />
           </label>
@@ -364,20 +394,36 @@ const App: React.FC = () => {
           <button
             onClick={handleRemoveText}
             disabled={currentSlides.length === 0 || isProcessing}
-            className="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 disabled:opacity-50 text-slate-200 rounded-lg text-sm font-medium border border-slate-600 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 disabled:opacity-50 rounded-lg text-sm font-medium border transition-colors"
+            style={{ backgroundColor: theme.neutralButtonBg, color: theme.neutralButtonText, borderColor: theme.headerBorder }}
           >
             <Eraser size={18} /><span>{isProcessing ? '처리 중...' : '텍스트 제거'}</span>
           </button>
 
-          <div className="w-px h-6 bg-slate-700 mx-2"></div>
+          <div className="w-px h-6 mx-2" style={{ backgroundColor: theme.headerBorder }}></div>
 
-          <button onClick={handleDownloadImages} disabled={currentSlides.length === 0} className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 disabled:opacity-50 text-slate-300 rounded-lg text-sm border border-slate-700 transition-all">
+          <button
+            onClick={handleDownloadImages}
+            disabled={currentSlides.length === 0}
+            className="flex items-center gap-2 px-4 py-2 disabled:opacity-50 rounded-lg text-sm border transition-all"
+            style={{ backgroundColor: theme.neutralButtonBg, color: theme.neutralButtonText, borderColor: theme.headerBorder }}
+          >
             <Download size={18} /><span>슬라이드 이미지 저장</span>
           </button>
-          <button onClick={handleDownloadPdf} disabled={currentSlides.length === 0} className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white rounded-lg text-sm font-bold shadow-lg border border-blue-500/50">
+          <button
+            onClick={handleDownloadPdf}
+            disabled={currentSlides.length === 0}
+            className="flex items-center gap-2 px-4 py-2 disabled:opacity-50 rounded-lg text-sm font-bold shadow-lg border"
+            style={{ backgroundColor: theme.primaryButtonBg, color: theme.primaryButtonText, borderColor: theme.primaryButtonBg }}
+          >
             <FileText size={18} /><span>PDF 다운로드</span>
           </button>
-          <button onClick={handleDownloadPpt} disabled={currentSlides.length === 0} className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white rounded-lg text-sm font-bold shadow-lg border border-indigo-500/50">
+          <button
+            onClick={handleDownloadPpt}
+            disabled={currentSlides.length === 0}
+            className="flex items-center gap-2 px-4 py-2 disabled:opacity-50 rounded-lg text-sm font-bold shadow-lg border"
+            style={{ backgroundColor: '#a78bfa', color: '#ffffff', borderColor: '#a78bfa' }}
+          >
             <Presentation size={18} /><span>PPT 다운로드</span>
           </button>
         </div>
@@ -393,16 +439,21 @@ const App: React.FC = () => {
             onSlideReorder={handleSlideReorder}
             isCollapsed={slidePanelCollapsed}
             onToggleCollapse={() => setSlidePanelCollapsed(prev => !prev)}
+            isDark={theme.isDark}
           />
         )}
 
         {/* Left Toolbar */}
-        <aside className="w-14 border-r border-slate-800 bg-[#1e293b] flex flex-col items-center py-4 gap-4 shrink-0 z-10">
+        <aside
+          className="w-14 border-r flex flex-col items-center py-4 gap-4 shrink-0 z-10"
+          style={{ borderColor: theme.sidePanelBorder, backgroundColor: theme.toolbarBg }}
+        >
           <div className="flex flex-col gap-2 w-full px-2">
             <button
               onClick={handleUndo}
               disabled={historyIndex <= 0}
-              className="p-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 disabled:opacity-30 disabled:hover:bg-slate-800 text-slate-300 border border-slate-700 transition-all flex items-center justify-center"
+              className="p-2.5 rounded-lg disabled:opacity-30 border transition-all flex items-center justify-center"
+              style={{ backgroundColor: theme.neutralButtonBg, color: theme.neutralButtonText, borderColor: theme.sidePanelBorder }}
               title="실행 취소 (Ctrl+Z)"
             >
               <Undo2 size={18} />
@@ -410,24 +461,26 @@ const App: React.FC = () => {
             <button
               onClick={handleRedo}
               disabled={historyIndex >= history.length - 1}
-              className="p-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 disabled:opacity-30 disabled:hover:bg-slate-800 text-slate-300 border border-slate-700 transition-all flex items-center justify-center"
+              className="p-2.5 rounded-lg disabled:opacity-30 border transition-all flex items-center justify-center"
+              style={{ backgroundColor: theme.neutralButtonBg, color: theme.neutralButtonText, borderColor: theme.sidePanelBorder }}
               title="다시 실행 (Ctrl+Shift+Z)"
             >
               <Redo2 size={18} />
             </button>
           </div>
-          <div className="w-6 h-px bg-slate-700"></div>
+          <div className="w-6 h-px" style={{ backgroundColor: theme.sidePanelBorder }}></div>
           <button
             onClick={handleDeleteAll}
             disabled={!currentSlides[activeSlideIdx]?.overlays?.length}
-            className="p-2.5 rounded-lg hover:bg-red-900/20 hover:text-red-400 disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-slate-400 text-slate-400 transition-colors"
+            className="p-2.5 rounded-lg hover:bg-red-900/20 hover:text-red-400 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+            style={{ color: theme.textSecondary }}
             title="현재 슬라이드 초기화"
           >
             <Trash2 size={20} />
           </button>
         </aside>
 
-        <div className="flex-1 flex flex-col bg-slate-950 relative">
+        <div className="flex-1 flex flex-col relative" style={{ backgroundColor: theme.mainCanvasBg }}>
           {isProcessing ? (
             <div className="flex-1 flex flex-col items-center justify-center gap-4">
               <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
@@ -438,16 +491,17 @@ const App: React.FC = () => {
               slide={currentSlides[activeSlideIdx]}
               selectedOverlayId={selectedOverlayId}
               draftOverlay={draftOverlay}
+              isDark={theme.isDark}
               onSelectionChange={(rect) => { setSelection(rect); if (rect) setSelectedOverlayId(null); }}
               onOverlaySelect={setSelectedOverlayId}
               onUpdateOverlays={handleUpdateOverlays}
             />
           ) : (
-            <div className="flex-1 flex flex-col items-center justify-center text-slate-500 p-8 text-center">
-              <div className="w-40 h-40 mb-10 bg-slate-900 rounded-[2.5rem] flex items-center justify-center border-2 border-dashed border-slate-800"><ImageIcon size={64} className="opacity-10" /></div>
-              <h3 className="text-2xl font-black text-slate-200 mb-3 tracking-tight">Slide AI Editor</h3>
-              <p className="text-slate-500 max-w-xs mx-auto text-sm leading-relaxed mb-10">PDF 또는 이미지를 업로드하여 지능형 텍스트 교체를 시작하세요.</p>
-              <label className="px-10 py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-black cursor-pointer shadow-2xl transition-all hover:scale-105 active:scale-95">
+            <div className="flex-1 flex flex-col items-center justify-center p-8 text-center" style={{ color: theme.textSecondary }}>
+              <div className="w-40 h-40 mb-10 rounded-[2.5rem] flex items-center justify-center border-2 border-dashed" style={{ backgroundColor: theme.neutralButtonBg, borderColor: theme.sidePanelBorder }}><ImageIcon size={64} className="opacity-10" /></div>
+              <h3 className="text-2xl font-black mb-3 tracking-tight" style={{ color: theme.textPrimary }}>Slide AI Editor</h3>
+              <p className="max-w-xs mx-auto text-sm leading-relaxed mb-10" style={{ color: theme.textSecondary }}>PDF 또는 이미지를 업로드하여 지능형 텍스트 교체를 시작하세요.</p>
+              <label className="px-10 py-4 text-white rounded-2xl font-black cursor-pointer shadow-2xl transition-all hover:scale-105 active:scale-95" style={{ backgroundColor: theme.primaryButtonBg }}>
                 파일 선택
                 <input type="file" accept=".pdf,image/*" className="hidden" onChange={handleFileUpload} />
               </label>
@@ -461,6 +515,7 @@ const App: React.FC = () => {
           onApplyOverlay={handleApplyOverlay}
           onUpdateOverlays={handleUpdateOverlays}
           onDraftChange={setDraftOverlay}
+          isDark={theme.isDark}
         />
       </main>
     </div>

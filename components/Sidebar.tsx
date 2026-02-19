@@ -33,6 +33,7 @@ interface SidebarProps {
   activeSlide: SlideData | undefined;
   selection: Rect | null;
   selectedOverlayId: string | null;
+  isDark: boolean;
   onApplyOverlay: (overlay: TextOverlay, keepSelection?: boolean) => void;
   onUpdateOverlays: (overlays: TextOverlay[]) => void;
   onDraftChange: (draft: Partial<TextOverlay> | null) => void; // Sync state to parent for preview
@@ -50,6 +51,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   activeSlide,
   selection,
   selectedOverlayId,
+  isDark,
   onApplyOverlay,
   onUpdateOverlays,
   onDraftChange
@@ -75,6 +77,11 @@ const Sidebar: React.FC<SidebarProps> = ({
 
   const selectedOverlay = activeSlide?.overlays.find(o => o.id === selectedOverlayId);
   const isImageOverlay = selectedOverlay?.type === 'image';
+  const panelStyle = {
+    backgroundColor: isDark ? '#0f131a' : '#ffffff',
+    borderColor: isDark ? '#1f2430' : '#e5e7eb',
+    color: isDark ? '#d1d5db' : '#1f2937'
+  };
 
   // Sync draft state for live preview when selection exists but not editing
   useEffect(() => {
@@ -417,9 +424,9 @@ const Sidebar: React.FC<SidebarProps> = ({
 
   if (isImageOverlay && selectedOverlay) {
     return (
-      <div className="w-80 h-full bg-[#1e293b] border-l border-slate-700 flex flex-col p-6 overflow-y-auto">
+      <div className="w-80 h-full border-l flex flex-col p-6 overflow-y-auto" style={panelStyle}>
         <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-sm font-bold text-slate-200 flex items-center gap-2">
+          <h2 className="text-sm font-bold flex items-center gap-2" style={{ color: isDark ? '#d1d5db' : '#1f2937' }}>
             <ImageIcon size={16} className="text-purple-400" />
             이미지 편집
           </h2>
@@ -514,17 +521,20 @@ const Sidebar: React.FC<SidebarProps> = ({
   }
 
   return (
-    <div className="w-80 h-full bg-[#1e293b] border-l border-slate-700 flex flex-col p-6 overflow-y-auto">
+    <div className="w-80 h-full border-l flex flex-col p-6 overflow-y-auto" style={panelStyle}>
       <div className="mb-6 flex items-center justify-between">
-        <h2 className="text-sm font-bold text-slate-200 flex items-center gap-2">
+        <h2 className="text-sm font-bold flex items-center gap-2" style={{ color: isDark ? '#d1d5db' : '#1f2937' }}>
           <TypeIcon size={16} className="text-blue-400" />
           {isEditing ? '텍스트 수정' : '텍스트 교체'}
         </h2>
       </div>
 
       {!selection && !isEditing ? (
-        <div className="flex-1 flex flex-col items-center justify-center text-center text-slate-400">
-          <div className="w-16 h-16 rounded-xl bg-slate-800 flex items-center justify-center mb-4 border border-slate-700">
+        <div className="flex-1 flex flex-col items-center justify-center text-center" style={{ color: isDark ? '#9ca3af' : '#6b7280' }}>
+          <div
+            className="w-16 h-16 rounded-xl flex items-center justify-center mb-4 border"
+            style={{ backgroundColor: isDark ? '#111827' : '#f8fafc', borderColor: isDark ? '#374151' : '#e5e7eb' }}
+          >
             <Info size={32} className="opacity-50" />
           </div>
           <p className="text-sm">텍스트 교체 영역을 선택하거나<br />교체된 텍스트를 클릭하세요</p>

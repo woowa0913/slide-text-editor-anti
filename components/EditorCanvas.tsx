@@ -7,6 +7,7 @@ interface EditorCanvasProps {
   slide: SlideData;
   selectedOverlayId: string | null;
   draftOverlay: Partial<TextOverlay> | null; // New prop for live preview
+  isDark: boolean;
   onSelectionChange: (rect: Rect | null) => void;
   onOverlaySelect: (id: string | null) => void;
   onUpdateOverlays: (overlays: TextOverlay[]) => void;
@@ -16,6 +17,7 @@ const EditorCanvas: React.FC<EditorCanvasProps> = ({
   slide, 
   selectedOverlayId,
   draftOverlay,
+  isDark,
   onSelectionChange, 
   onOverlaySelect,
   onUpdateOverlays 
@@ -604,27 +606,53 @@ const EditorCanvas: React.FC<EditorCanvasProps> = ({
   };
 
   return (
-    <div ref={containerRef} className="flex-1 relative overflow-hidden bg-[#0f172a] flex items-center justify-center select-none">
+    <div
+      ref={containerRef}
+      className="flex-1 relative overflow-hidden flex items-center justify-center select-none"
+      style={{ backgroundColor: isDark ? '#0b1017' : '#eef2ff' }}
+    >
       <canvas ref={canvasRef} onMouseDown={handleMouseDown} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp} onMouseLeave={handleMouseUp} onContextMenu={(e) => e.preventDefault()} className="block w-full h-full" />
       {/* Updated Control Panel: Single line, wider */}
-      <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-slate-800/90 px-5 py-2.5 rounded-full text-xs font-medium text-slate-200 border border-slate-700 shadow-2xl pointer-events-none flex items-center gap-4 backdrop-blur-sm whitespace-nowrap min-w-max">
+      <div
+        className="absolute top-4 left-1/2 -translate-x-1/2 px-5 py-2.5 rounded-full text-xs font-medium border shadow-2xl pointer-events-none flex items-center gap-4 backdrop-blur-sm whitespace-nowrap min-w-max"
+        style={{
+          backgroundColor: isDark ? 'rgba(26,31,42,0.9)' : 'rgba(255,255,255,0.92)',
+          borderColor: isDark ? '#1f2430' : '#e5e7eb',
+          color: isDark ? '#e5e7eb' : '#374151'
+        }}
+      >
         <div className="flex items-center gap-2">
-          <span className="bg-slate-700 px-1.5 py-0.5 rounded text-[10px] text-blue-400 font-bold">Space + Drag</span>
+          <span
+            className="px-1.5 py-0.5 rounded text-[10px] font-bold"
+            style={{ backgroundColor: isDark ? '#11151d' : '#eef0ff', color: isDark ? '#a5b4fc' : '#4f46e5' }}
+          >
+            Space + Drag
+          </span>
           <span>이동</span>
         </div>
-        <div className="w-px h-3 bg-slate-600"></div>
+        <div className="w-px h-3" style={{ backgroundColor: isDark ? '#4b5563' : '#cbd5e1' }}></div>
         <div className="flex items-center gap-2">
-           <span className="bg-slate-700 px-1.5 py-0.5 rounded text-[10px] text-blue-400 font-bold">Space + Wheel</span>
+           <span
+             className="px-1.5 py-0.5 rounded text-[10px] font-bold"
+             style={{ backgroundColor: isDark ? '#11151d' : '#eef0ff', color: isDark ? '#a5b4fc' : '#4f46e5' }}
+           >
+             Space + Wheel
+           </span>
            <span>확대/축소</span>
         </div>
-        <div className="w-px h-3 bg-slate-600"></div>
+        <div className="w-px h-3" style={{ backgroundColor: isDark ? '#4b5563' : '#cbd5e1' }}></div>
         <div className="flex items-center gap-2">
-          <span className="bg-slate-700 px-1.5 py-0.5 rounded text-[10px] text-blue-400 font-bold">Drag Selection</span>
+          <span
+            className="px-1.5 py-0.5 rounded text-[10px] font-bold"
+            style={{ backgroundColor: isDark ? '#11151d' : '#eef0ff', color: isDark ? '#a5b4fc' : '#4f46e5' }}
+          >
+            Drag Selection
+          </span>
           <span>영역 선택</span>
         </div>
-        <div className="w-px h-3 bg-slate-600"></div>
+        <div className="w-px h-3" style={{ backgroundColor: isDark ? '#4b5563' : '#cbd5e1' }}></div>
         <div className="flex items-center gap-2">
-           <span className="text-slate-400 font-mono">{Math.round(zoom * 100)}%</span>
+           <span className="font-mono" style={{ color: isDark ? '#9ca3af' : '#64748b' }}>{Math.round(zoom * 100)}%</span>
         </div>
       </div>
     </div>

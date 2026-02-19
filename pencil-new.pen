@@ -1,0 +1,2654 @@
+{
+  "version": "2.8",
+  "children": [
+    {
+      "type": "frame",
+      "id": "bi8Au",
+      "x": 0,
+      "y": 0,
+      "name": "Slide AI Editor UI",
+      "clip": true,
+      "width": 1440,
+      "height": 900,
+      "fill": "#0f172a",
+      "layout": "none",
+      "children": [
+        {
+          "type": "rectangle",
+          "id": "SZG6G",
+          "x": 0,
+          "y": 0,
+          "name": "Header",
+          "fill": "#1e293b",
+          "width": 1440,
+          "height": 64
+        },
+        {
+          "type": "rectangle",
+          "id": "akwUS",
+          "x": 0,
+          "y": 64,
+          "name": "Slide Panel",
+          "fill": "#111827",
+          "width": 192,
+          "height": 836
+        },
+        {
+          "type": "rectangle",
+          "id": "v42Id",
+          "x": 192,
+          "y": 64,
+          "name": "Toolbar",
+          "fill": "#1e293b",
+          "width": 56,
+          "height": 836
+        },
+        {
+          "type": "rectangle",
+          "id": "uJqyU",
+          "x": 248,
+          "y": 64,
+          "name": "Main Canvas",
+          "fill": "#020617",
+          "width": 872,
+          "height": 836
+        },
+        {
+          "type": "rectangle",
+          "id": "tjAlS",
+          "x": 1120,
+          "y": 64,
+          "name": "Sidebar",
+          "fill": "#1e293b",
+          "width": 320,
+          "height": 836
+        },
+        {
+          "type": "text",
+          "id": "aacZm",
+          "x": 24,
+          "y": 20,
+          "name": "title",
+          "fill": "#e2e8f0",
+          "content": "Slide AI Editor",
+          "fontFamily": "Inter",
+          "fontSize": 24,
+          "fontWeight": "700"
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 8,
+          "id": "cPDJn",
+          "x": 810,
+          "y": 14,
+          "name": "uploadBtn",
+          "fill": "#334155",
+          "width": 124,
+          "height": 36
+        },
+        {
+          "type": "text",
+          "id": "ZJN4m",
+          "x": 840,
+          "y": 24,
+          "name": "uploadLabel",
+          "fill": "#e2e8f0",
+          "content": "파일 업로드",
+          "fontFamily": "Inter",
+          "fontSize": 13,
+          "fontWeight": "600"
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 8,
+          "id": "pC7k1",
+          "x": 946,
+          "y": 14,
+          "name": "addImgBtn",
+          "fill": "#334155",
+          "width": 110,
+          "height": 36
+        },
+        {
+          "type": "text",
+          "id": "SXhE8",
+          "x": 976,
+          "y": 24,
+          "name": "addImgLabel",
+          "fill": "#e2e8f0",
+          "content": "이미지 추가",
+          "fontFamily": "Inter",
+          "fontSize": 13,
+          "fontWeight": "600"
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 8,
+          "id": "0qnJ3",
+          "x": 1068,
+          "y": 14,
+          "name": "removeBtn",
+          "fill": "#334155",
+          "width": 106,
+          "height": 36
+        },
+        {
+          "type": "text",
+          "id": "P7oXo",
+          "x": 1098,
+          "y": 24,
+          "name": "removeLabel",
+          "fill": "#e2e8f0",
+          "content": "텍스트 제거",
+          "fontFamily": "Inter",
+          "fontSize": 13,
+          "fontWeight": "600"
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 8,
+          "id": "8UnNh",
+          "x": 1288,
+          "y": 14,
+          "name": "pdfBtn",
+          "fill": "#2563eb",
+          "width": 120,
+          "height": 36
+        },
+        {
+          "type": "text",
+          "id": "pTDSR",
+          "x": 1316,
+          "y": 24,
+          "name": "pdfLabel",
+          "fill": "#ffffff",
+          "content": "PDF 다운로드",
+          "fontFamily": "Inter",
+          "fontSize": 13,
+          "fontWeight": "700"
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 8,
+          "id": "w6q8u",
+          "x": 1158,
+          "y": 14,
+          "name": "pptBtn",
+          "fill": "#4f46e5",
+          "width": 120,
+          "height": 36
+        },
+        {
+          "type": "text",
+          "id": "Psg3v",
+          "x": 1186,
+          "y": 24,
+          "name": "pptLabel",
+          "fill": "#ffffff",
+          "content": "PPT 다운로드",
+          "fontFamily": "Inter",
+          "fontSize": 13,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "7jbTx",
+          "x": 18,
+          "y": 82,
+          "name": "leftTitle",
+          "fill": "#94a3b8",
+          "content": "슬라이드",
+          "fontFamily": "Inter",
+          "fontSize": 12,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "2hU8W",
+          "x": 1144,
+          "y": 92,
+          "name": "sidebarTitle",
+          "fill": "#e2e8f0",
+          "content": "텍스트 교체",
+          "fontFamily": "Inter",
+          "fontSize": 14,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "ZJAq0",
+          "x": 574,
+          "y": 468,
+          "name": "canvasHint",
+          "fill": "#475569",
+          "content": "캔버스 미리보기 영역",
+          "fontFamily": "Inter",
+          "fontSize": 20,
+          "fontWeight": "600"
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 8,
+          "id": "qT5qd",
+          "x": 16,
+          "y": 116,
+          "name": "thumb1",
+          "fill": "#0b1220",
+          "width": 160,
+          "height": 102
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 8,
+          "id": "ldyw0",
+          "x": 16,
+          "y": 230,
+          "name": "thumb2",
+          "fill": "#0b1220",
+          "width": 160,
+          "height": 102
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 8,
+          "id": "ajQ8a",
+          "x": 16,
+          "y": 344,
+          "name": "thumb3",
+          "fill": "#0b1220",
+          "width": 160,
+          "height": 102
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 8,
+          "id": "AZNsJ",
+          "x": 204,
+          "y": 86,
+          "name": "undoBtn",
+          "fill": "#0f172a",
+          "width": 32,
+          "height": 32
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 8,
+          "id": "goNTO",
+          "x": 204,
+          "y": 126,
+          "name": "redoBtn",
+          "fill": "#0f172a",
+          "width": 32,
+          "height": 32
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 8,
+          "id": "qLHWa",
+          "x": 204,
+          "y": 182,
+          "name": "clearBtn",
+          "fill": "#3f1d2e",
+          "width": 32,
+          "height": 32
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 10,
+          "id": "6qRZ6",
+          "x": 1144,
+          "y": 134,
+          "name": "panelBox1",
+          "fill": "#0f172a",
+          "width": 272,
+          "height": 92
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 10,
+          "id": "dWsHy",
+          "x": 1144,
+          "y": 244,
+          "name": "panelBox2",
+          "fill": "#0f172a",
+          "width": 272,
+          "height": 56
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 10,
+          "id": "WbREd",
+          "x": 1144,
+          "y": 314,
+          "name": "panelBox3",
+          "fill": "#0f172a",
+          "width": 272,
+          "height": 56
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 10,
+          "id": "NzVlX",
+          "x": 1144,
+          "y": 790,
+          "name": "applyBtn",
+          "fill": "#2563eb",
+          "width": 272,
+          "height": 44
+        },
+        {
+          "type": "text",
+          "id": "EcapW",
+          "x": 1244,
+          "y": 805,
+          "name": "applyTxt",
+          "fill": "#ffffff",
+          "content": "텍스트 적용",
+          "fontFamily": "Inter",
+          "fontSize": 14,
+          "fontWeight": "700"
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "n6IHl",
+      "x": 1560,
+      "y": 0,
+      "name": "Toss Style - Slide AI Editor",
+      "clip": true,
+      "width": 1440,
+      "height": 900,
+      "fill": "#f3f4f6",
+      "layout": "none",
+      "children": [
+        {
+          "type": "rectangle",
+          "cornerRadius": 20,
+          "id": "YmMj0",
+          "x": 24,
+          "y": 20,
+          "name": "Top Bar",
+          "fill": "#ffffff",
+          "width": 1392,
+          "height": 72,
+          "stroke": {
+            "align": "inside",
+            "thickness": 1,
+            "fill": "#e5e7eb"
+          }
+        },
+        {
+          "type": "text",
+          "id": "KLoNI",
+          "x": 52,
+          "y": 47,
+          "fill": "#111827",
+          "content": "Slide AI Editor",
+          "fontFamily": "Inter",
+          "fontSize": 24,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "ClYEf",
+          "x": 260,
+          "y": 52,
+          "fill": "#6b7280",
+          "content": "Toss-style Concept",
+          "fontFamily": "Inter",
+          "fontSize": 14,
+          "fontWeight": "500"
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 24,
+          "id": "rkuxC",
+          "x": 24,
+          "y": 112,
+          "fill": "#ffffff",
+          "width": 220,
+          "height": 764
+        },
+        {
+          "type": "text",
+          "id": "7nIA1",
+          "x": 48,
+          "y": 140,
+          "fill": "#111827",
+          "content": "슬라이드",
+          "fontFamily": "Inter",
+          "fontSize": 15,
+          "fontWeight": "700"
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 14,
+          "id": "E4Dns",
+          "x": 44,
+          "y": 176,
+          "fill": "#f9fafb",
+          "width": 180,
+          "height": 110,
+          "stroke": {
+            "align": "inside",
+            "thickness": 2,
+            "fill": "#dbeafe"
+          }
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 14,
+          "id": "T7gTV",
+          "x": 44,
+          "y": 298,
+          "fill": "#f9fafb",
+          "width": 180,
+          "height": 110,
+          "stroke": {
+            "align": "inside",
+            "thickness": 1,
+            "fill": "#e5e7eb"
+          }
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 28,
+          "id": "UQ2k9",
+          "x": 264,
+          "y": 112,
+          "fill": "#ffffff",
+          "width": 860,
+          "height": 764
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 22,
+          "id": "QgDcE",
+          "x": 304,
+          "y": 186,
+          "fill": "#f3f8ff",
+          "width": 780,
+          "height": 618
+        },
+        {
+          "type": "text",
+          "id": "bZ1bd",
+          "x": 602,
+          "y": 483,
+          "fill": "#6b7280",
+          "content": "캔버스 미리보기",
+          "fontFamily": "Inter",
+          "fontSize": 22,
+          "fontWeight": "600"
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 24,
+          "id": "NMKXv",
+          "x": 1144,
+          "y": 112,
+          "fill": "#ffffff",
+          "width": 272,
+          "height": 764
+        },
+        {
+          "type": "text",
+          "id": "GkpiV",
+          "x": 1170,
+          "y": 140,
+          "fill": "#111827",
+          "content": "텍스트 설정",
+          "fontFamily": "Inter",
+          "fontSize": 15,
+          "fontWeight": "700"
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 14,
+          "id": "Db8h4",
+          "x": 1170,
+          "y": 176,
+          "fill": "#f9fafb",
+          "width": 220,
+          "height": 86
+        },
+        {
+          "type": "frame",
+          "id": "Aj23K",
+          "x": 952,
+          "y": 38,
+          "name": "uploadBtn2",
+          "width": 108,
+          "height": 36,
+          "fill": "#f3f4f6",
+          "cornerRadius": 18,
+          "justifyContent": "center",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "jmwoO",
+              "fill": "#374151",
+              "content": "업로드",
+              "fontFamily": "Inter",
+              "fontSize": 13,
+              "fontWeight": "600"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "qc0MK",
+          "x": 1072,
+          "y": 38,
+          "name": "removeBtn2",
+          "width": 108,
+          "height": 36,
+          "fill": "#f3f4f6",
+          "cornerRadius": 18,
+          "justifyContent": "center",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "lTMob",
+              "fill": "#374151",
+              "content": "텍스트 제거",
+              "fontFamily": "Inter",
+              "fontSize": 13,
+              "fontWeight": "600"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "QcQGb",
+          "x": 1192,
+          "y": 38,
+          "name": "pptBtn2",
+          "width": 96,
+          "height": 36,
+          "fill": "#e8f0ff",
+          "cornerRadius": 18,
+          "justifyContent": "center",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "yIesJ",
+              "fill": "#2563eb",
+              "content": "PPT",
+              "fontFamily": "Inter",
+              "fontSize": 13,
+              "fontWeight": "700"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "0Ee6L",
+          "x": 1298,
+          "y": 38,
+          "name": "pdfBtn2",
+          "width": 96,
+          "height": 36,
+          "fill": "#3182f6",
+          "cornerRadius": 18,
+          "justifyContent": "center",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "uQPIt",
+              "fill": "#ffffff",
+              "content": "PDF",
+              "fontFamily": "Inter",
+              "fontSize": 13,
+              "fontWeight": "700"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "rFUcg",
+          "x": 1170,
+          "y": 816,
+          "name": "applyBtn2",
+          "width": 220,
+          "height": 44,
+          "fill": "#3182f6",
+          "cornerRadius": 22,
+          "justifyContent": "center",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "Ezjke",
+              "fill": "#ffffff",
+              "content": "텍스트 적용",
+              "fontFamily": "Inter",
+              "fontSize": 14,
+              "fontWeight": "700"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "Z4v1c",
+      "x": 3120,
+      "y": 0,
+      "name": "Design System Download",
+      "clip": true,
+      "width": 1440,
+      "height": 1400,
+      "fill": "#0b1020",
+      "layout": "none"
+    },
+    {
+      "type": "rectangle",
+      "cornerRadius": 24,
+      "id": "aMQZV",
+      "x": 40,
+      "y": 40,
+      "name": "hero",
+      "fill": "#0f172a",
+      "width": 1360,
+      "height": 160
+    },
+    {
+      "type": "text",
+      "id": "kTScX",
+      "x": 64,
+      "y": 76,
+      "name": "heroTitle",
+      "fill": "#f8fafc",
+      "content": "Design System Library",
+      "fontFamily": "Inter",
+      "fontSize": 32,
+      "fontWeight": "700"
+    },
+    {
+      "type": "text",
+      "id": "pheG8",
+      "x": 64,
+      "y": 118,
+      "name": "heroSub",
+      "fill": "#cbd5e1",
+      "content": "샘플 프리뷰와 함께 필요한 디자인 시스템 MD 파일을 바로 다운로드하세요.",
+      "fontFamily": "Inter",
+      "fontSize": 16,
+      "fontWeight": "500"
+    },
+    {
+      "type": "rectangle",
+      "cornerRadius": 20,
+      "id": "47WgT",
+      "x": 40,
+      "y": 230,
+      "name": "card-apple",
+      "fill": "#111827",
+      "width": 660,
+      "height": 260,
+      "stroke": {
+        "align": "inside",
+        "thickness": 1,
+        "fill": "#1f2937"
+      }
+    },
+    {
+      "type": "rectangle",
+      "cornerRadius": 14,
+      "id": "2DwYk",
+      "x": 60,
+      "y": 250,
+      "name": "apple-shot",
+      "metadata": {
+        "type": "unsplash",
+        "username": "its__criss",
+        "link": "https://unsplash.com/@its__criss",
+        "author": "Cristian Musolino"
+      },
+      "fill": {
+        "type": "image",
+        "enabled": true,
+        "url": "https://images.unsplash.com/photo-1568291652621-5c9754a9e70a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3NzEzODM0MzR8&ixlib=rb-4.1.0&q=80&w=1080",
+        "mode": "fill"
+      },
+      "width": 260,
+      "height": 160
+    },
+    {
+      "type": "text",
+      "id": "5lPdr",
+      "x": 340,
+      "y": 256,
+      "name": "appleTitle",
+      "fill": "#f8fafc",
+      "content": "Apple HIG 기반 SaaS Design System",
+      "fontFamily": "Inter",
+      "fontSize": 18,
+      "fontWeight": "700"
+    },
+    {
+      "type": "text",
+      "id": "W80tx",
+      "x": 340,
+      "y": 292,
+      "name": "appleDl",
+      "fill": "#cbd5e1",
+      "content": "⬇ design-system-apple-hig.md · v1.0 · clarity · calm · depth",
+      "fontFamily": "Inter",
+      "fontSize": 14,
+      "fontWeight": "500"
+    },
+    {
+      "type": "rectangle",
+      "cornerRadius": 20,
+      "id": "I7eDG",
+      "x": 740,
+      "y": 230,
+      "name": "card-stripe",
+      "fill": "#0d1320",
+      "width": 660,
+      "height": 260,
+      "stroke": {
+        "align": "inside",
+        "thickness": 1,
+        "fill": "#1f2937"
+      }
+    },
+    {
+      "type": "rectangle",
+      "cornerRadius": 14,
+      "id": "VjBS3",
+      "x": 760,
+      "y": 250,
+      "name": "stripe-shot",
+      "metadata": {
+        "type": "unsplash",
+        "username": "sigmund",
+        "link": "https://unsplash.com/@sigmund",
+        "author": "Sigmund"
+      },
+      "fill": {
+        "type": "image",
+        "enabled": true,
+        "url": "https://images.unsplash.com/photo-1658438243541-b877584927ef?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3NzEzODM0MzV8&ixlib=rb-4.1.0&q=80&w=1080",
+        "mode": "fill"
+      },
+      "width": 260,
+      "height": 160
+    },
+    {
+      "type": "text",
+      "id": "tzx3V",
+      "x": 1040,
+      "y": 256,
+      "name": "stripeTitle",
+      "fill": "#f8fafc",
+      "content": "Stripe Apps Style · Tokens + 패턴",
+      "fontFamily": "Inter",
+      "fontSize": 18,
+      "fontWeight": "700"
+    },
+    {
+      "type": "text",
+      "id": "qKjHY",
+      "x": 1040,
+      "y": 292,
+      "name": "stripeDl",
+      "fill": "#cbd5e1",
+      "content": "⬇ design-tokens-stripe-apps.json · example-components.md · token-first",
+      "fontFamily": "Inter",
+      "fontSize": 14,
+      "fontWeight": "500"
+    },
+    {
+      "type": "rectangle",
+      "cornerRadius": 20,
+      "id": "bto4b",
+      "x": 40,
+      "y": 520,
+      "name": "card-linear",
+      "fill": "#0d0f14",
+      "width": 660,
+      "height": 260,
+      "stroke": {
+        "align": "inside",
+        "thickness": 1,
+        "fill": "#1f2937"
+      }
+    },
+    {
+      "type": "rectangle",
+      "cornerRadius": 14,
+      "id": "c2Y5W",
+      "x": 60,
+      "y": 540,
+      "name": "linear-shot",
+      "metadata": {
+        "type": "unsplash",
+        "username": "anniespratt",
+        "link": "https://unsplash.com/@anniespratt",
+        "author": "Annie Spratt"
+      },
+      "fill": {
+        "type": "image",
+        "enabled": true,
+        "url": "https://images.unsplash.com/photo-1600933476578-9139cb52a94e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3NzEzODM0MzZ8&ixlib=rb-4.1.0&q=80&w=1080",
+        "mode": "fill"
+      },
+      "width": 260,
+      "height": 160
+    },
+    {
+      "type": "text",
+      "id": "nIXmk",
+      "x": 340,
+      "y": 546,
+      "name": "linearTitle",
+      "fill": "#f8fafc",
+      "content": "Linear 브랜드 인스파이어드 Minimal System",
+      "fontFamily": "Inter",
+      "fontSize": 18,
+      "fontWeight": "700"
+    },
+    {
+      "type": "text",
+      "id": "sSOHb",
+      "x": 340,
+      "y": 582,
+      "name": "linearDl",
+      "fill": "#cbd5e1",
+      "content": "⬇ linear-design-system.md · dark-first · command palette ready",
+      "fontFamily": "Inter",
+      "fontSize": 14,
+      "fontWeight": "500"
+    },
+    {
+      "type": "rectangle",
+      "cornerRadius": 20,
+      "id": "2ErnX",
+      "x": 740,
+      "y": 520,
+      "name": "card-toss",
+      "fill": "#f8fafc",
+      "width": 660,
+      "height": 260,
+      "stroke": {
+        "align": "inside",
+        "thickness": 1,
+        "fill": "#e5e7eb"
+      }
+    },
+    {
+      "type": "rectangle",
+      "cornerRadius": 14,
+      "id": "gG7sM",
+      "x": 760,
+      "y": 540,
+      "name": "toss-shot",
+      "metadata": {
+        "type": "unsplash",
+        "username": "brandonstoll",
+        "link": "https://unsplash.com/@brandonstoll",
+        "author": "Brandon Stoll"
+      },
+      "fill": {
+        "type": "image",
+        "enabled": true,
+        "url": "https://images.unsplash.com/photo-1746639643018-e600b8c194b8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3NzEzODM0MzZ8&ixlib=rb-4.1.0&q=80&w=1080",
+        "mode": "fill"
+      },
+      "width": 260,
+      "height": 160
+    },
+    {
+      "type": "text",
+      "id": "jthxu",
+      "x": 1040,
+      "y": 546,
+      "name": "tossTitle",
+      "fill": "#0f172a",
+      "content": "Toss-Inspired Clean & Confident System",
+      "fontFamily": "Inter",
+      "fontSize": 18,
+      "fontWeight": "700"
+    },
+    {
+      "type": "text",
+      "id": "trSlO",
+      "x": 1040,
+      "y": 582,
+      "name": "tossDl",
+      "fill": "#1f2937",
+      "content": "⬇ design-system-toss.md · bold type · generous whitespace",
+      "fontFamily": "Inter",
+      "fontSize": 14,
+      "fontWeight": "600"
+    },
+    {
+      "type": "frame",
+      "id": "FiIrV",
+      "x": 0,
+      "y": 1520,
+      "name": "Variant 1 - Toss Style",
+      "clip": true,
+      "width": 1440,
+      "height": 900,
+      "fill": "#ffffff",
+      "layout": "none",
+      "children": [
+        {
+          "type": "rectangle",
+          "id": "zTiSp",
+          "x": 0,
+          "y": 0,
+          "name": "Header",
+          "fill": "#ffffff",
+          "width": 1440,
+          "height": 88,
+          "stroke": {
+            "align": "inside",
+            "thickness": {
+              "bottom": 1
+            },
+            "fill": "#e5e7eb"
+          }
+        },
+        {
+          "type": "rectangle",
+          "id": "aHP2d",
+          "x": 0,
+          "y": 88,
+          "name": "Slide Panel",
+          "fill": "#f5f7fb",
+          "width": 220,
+          "height": 812,
+          "stroke": {
+            "align": "inside",
+            "thickness": {
+              "right": 1
+            },
+            "fill": "#e5e7eb"
+          }
+        },
+        {
+          "type": "rectangle",
+          "id": "nQVkn",
+          "x": 220,
+          "y": 88,
+          "name": "Toolbar",
+          "fill": "#f5f7fb",
+          "width": 64,
+          "height": 812,
+          "stroke": {
+            "align": "inside",
+            "thickness": {
+              "right": 1
+            },
+            "fill": "#e5e7eb"
+          }
+        },
+        {
+          "type": "rectangle",
+          "id": "pj8Yw",
+          "x": 284,
+          "y": 88,
+          "name": "Main Canvas",
+          "fill": "#f2f6fd",
+          "width": 796,
+          "height": 812
+        },
+        {
+          "type": "rectangle",
+          "id": "jWLrP",
+          "x": 1080,
+          "y": 88,
+          "name": "Sidebar",
+          "fill": "#f8fafc",
+          "width": 360,
+          "height": 812,
+          "stroke": {
+            "align": "inside",
+            "thickness": {
+              "left": 1
+            },
+            "fill": "#e5e7eb"
+          }
+        },
+        {
+          "type": "text",
+          "id": "Jw33B",
+          "x": 28,
+          "y": 26,
+          "name": "title",
+          "fill": "#111827",
+          "content": "Slide AI Editor",
+          "fontFamily": "Inter",
+          "fontSize": 40,
+          "fontWeight": "700"
+        },
+        {
+          "type": "frame",
+          "id": "stjjm",
+          "x": 726,
+          "y": 20,
+          "name": "tBtn1",
+          "width": 130,
+          "height": 48,
+          "fill": "#eef2f7",
+          "cornerRadius": 16,
+          "layout": "none",
+          "children": [
+            {
+              "type": "text",
+              "id": "0XGji",
+              "x": 0,
+              "y": 0,
+              "fill": "#111827",
+              "textGrowth": "fixed-width-height",
+              "width": 130,
+              "height": 48,
+              "content": "파일 업로드",
+              "textAlign": "center",
+              "textAlignVertical": "middle",
+              "fontFamily": "Inter",
+              "fontSize": 16,
+              "fontWeight": "700"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "OARbr",
+          "x": 868,
+          "y": 20,
+          "name": "tBtn2",
+          "width": 120,
+          "height": 48,
+          "fill": "#eef2f7",
+          "cornerRadius": 16,
+          "layout": "none",
+          "children": [
+            {
+              "type": "text",
+              "id": "ObjCY",
+              "x": 0,
+              "y": 0,
+              "fill": "#111827",
+              "textGrowth": "fixed-width-height",
+              "width": 120,
+              "height": 48,
+              "content": "이미지 추가",
+              "textAlign": "center",
+              "textAlignVertical": "middle",
+              "fontFamily": "Inter",
+              "fontSize": 16,
+              "fontWeight": "700"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "lDn1m",
+          "x": 1000,
+          "y": 20,
+          "name": "tBtn3",
+          "width": 120,
+          "height": 48,
+          "fill": "#eef2f7",
+          "cornerRadius": 16,
+          "layout": "none",
+          "children": [
+            {
+              "type": "text",
+              "id": "7xYBo",
+              "x": 0,
+              "y": 0,
+              "fill": "#111827",
+              "textGrowth": "fixed-width-height",
+              "width": 120,
+              "height": 48,
+              "content": "텍스트 제거",
+              "textAlign": "center",
+              "textAlignVertical": "middle",
+              "fontFamily": "Inter",
+              "fontSize": 16,
+              "fontWeight": "700"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "znL6F",
+          "x": 1276,
+          "y": 20,
+          "name": "tBtn5",
+          "width": 132,
+          "height": 48,
+          "fill": "#0064FF",
+          "cornerRadius": 16,
+          "layout": "none",
+          "children": [
+            {
+              "type": "text",
+              "id": "fYz3n",
+              "x": 0,
+              "y": 0,
+              "fill": "#ffffff",
+              "textGrowth": "fixed-width-height",
+              "width": 132,
+              "height": 48,
+              "content": "PDF 다운로드",
+              "textAlign": "center",
+              "textAlignVertical": "middle",
+              "fontFamily": "Inter",
+              "fontSize": 16,
+              "fontWeight": "700"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "GSaju",
+          "x": 1132,
+          "y": 20,
+          "name": "tBtn4",
+          "width": 132,
+          "height": 48,
+          "fill": "#dbeafe",
+          "cornerRadius": 16,
+          "layout": "none",
+          "children": [
+            {
+              "type": "text",
+              "id": "oNoE4",
+              "x": 0,
+              "y": 0,
+              "fill": "#0064FF",
+              "textGrowth": "fixed-width-height",
+              "width": 132,
+              "height": 48,
+              "content": "PPT 다운로드",
+              "textAlign": "center",
+              "textAlignVertical": "middle",
+              "fontFamily": "Inter",
+              "fontSize": 16,
+              "fontWeight": "700"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "pKA9E",
+          "x": 24,
+          "y": 110,
+          "name": "leftTitle",
+          "fill": "#6b7280",
+          "content": "슬라이드",
+          "fontFamily": "Inter",
+          "fontSize": 16,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "IltN2",
+          "x": 1108,
+          "y": 120,
+          "name": "sidebarTitle",
+          "fill": "#111827",
+          "content": "텍스트 교체",
+          "fontFamily": "Inter",
+          "fontSize": 16,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "0pw5i",
+          "x": 574,
+          "y": 468,
+          "name": "canvasHint",
+          "fill": "#6b7280",
+          "content": "캔버스 미리보기 영역",
+          "fontFamily": "Inter",
+          "fontSize": 24,
+          "fontWeight": "700"
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 8,
+          "id": "bB0p5",
+          "x": 24,
+          "y": 152,
+          "name": "thumb1",
+          "fill": "#eef2f7",
+          "width": 172,
+          "height": 102
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 8,
+          "id": "MbZkJ",
+          "x": 24,
+          "y": 280,
+          "name": "thumb2",
+          "fill": "#eef2f7",
+          "width": 172,
+          "height": 102
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 8,
+          "id": "SPUCB",
+          "x": 24,
+          "y": 408,
+          "name": "thumb3",
+          "fill": "#eef2f7",
+          "width": 172,
+          "height": 102
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 8,
+          "id": "EkBVX",
+          "x": 204,
+          "y": 86,
+          "name": "undoBtn",
+          "fill": "#ffffff",
+          "width": 32,
+          "height": 32
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 8,
+          "id": "MQUtH",
+          "x": 204,
+          "y": 126,
+          "name": "redoBtn",
+          "fill": "#ffffff",
+          "width": 32,
+          "height": 32
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 8,
+          "id": "yV3uN",
+          "x": 204,
+          "y": 182,
+          "name": "clearBtn",
+          "fill": "#e5e7eb",
+          "width": 32,
+          "height": 32
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 16,
+          "id": "gWZmO",
+          "x": 1108,
+          "y": 168,
+          "name": "panelBox1",
+          "fill": "#ffffff",
+          "width": 304,
+          "height": 100
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 16,
+          "id": "dQmV3",
+          "x": 1108,
+          "y": 284,
+          "name": "panelBox2",
+          "fill": "#ffffff",
+          "width": 304,
+          "height": 64
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 16,
+          "id": "nr1vw",
+          "x": 1108,
+          "y": 364,
+          "name": "panelBox3",
+          "fill": "#ffffff",
+          "width": 304,
+          "height": 64
+        },
+        {
+          "type": "frame",
+          "id": "z7RVu",
+          "x": 1108,
+          "y": 804,
+          "name": "tBtn6",
+          "width": 304,
+          "height": 56,
+          "fill": "#0064FF",
+          "cornerRadius": 16,
+          "layout": "none",
+          "children": [
+            {
+              "type": "text",
+              "id": "MwHmC",
+              "x": 0,
+              "y": 0,
+              "fill": "#ffffff",
+              "textGrowth": "fixed-width-height",
+              "width": 304,
+              "height": 56,
+              "content": "텍스트 적용",
+              "textAlign": "center",
+              "textAlignVertical": "middle",
+              "fontFamily": "Inter",
+              "fontSize": 16,
+              "fontWeight": "700"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "U661C",
+          "x": 24,
+          "y": 868,
+          "fill": "#2563eb",
+          "content": "TOSS VARIANT",
+          "fontFamily": "Inter",
+          "fontSize": 12,
+          "fontWeight": "700"
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "x7a8T",
+      "x": 1560,
+      "y": 1520,
+      "name": "Variant 2 - Apple HIG",
+      "clip": true,
+      "width": 1440,
+      "height": 900,
+      "fill": "#f8fafc",
+      "layout": "none",
+      "children": [
+        {
+          "type": "rectangle",
+          "id": "gpA0g",
+          "x": 0,
+          "y": 0,
+          "name": "Header",
+          "fill": "#f8fafc",
+          "width": 1440,
+          "height": 72,
+          "stroke": {
+            "align": "inside",
+            "thickness": {
+              "bottom": 1
+            },
+            "fill": "#e2e8f0"
+          }
+        },
+        {
+          "type": "rectangle",
+          "id": "wKkW8",
+          "x": 0,
+          "y": 72,
+          "name": "Slide Panel",
+          "fill": "#ffffff",
+          "width": 208,
+          "height": 828,
+          "stroke": {
+            "align": "inside",
+            "thickness": {
+              "right": 1
+            },
+            "fill": "#e5e7eb"
+          }
+        },
+        {
+          "type": "rectangle",
+          "id": "Kpse1",
+          "x": 208,
+          "y": 72,
+          "name": "Toolbar",
+          "fill": "#ffffff",
+          "width": 56,
+          "height": 828,
+          "stroke": {
+            "align": "inside",
+            "thickness": {
+              "right": 1
+            },
+            "fill": "#e5e7eb"
+          }
+        },
+        {
+          "type": "rectangle",
+          "id": "EMyp0",
+          "x": 264,
+          "y": 72,
+          "name": "Main Canvas",
+          "fill": "#f1f5f9",
+          "width": 872,
+          "height": 828
+        },
+        {
+          "type": "rectangle",
+          "id": "YAsb7",
+          "x": 1136,
+          "y": 72,
+          "name": "Sidebar",
+          "fill": "#ffffff",
+          "width": 304,
+          "height": 828,
+          "stroke": {
+            "align": "inside",
+            "thickness": {
+              "left": 1
+            },
+            "fill": "#e5e7eb"
+          }
+        },
+        {
+          "type": "text",
+          "id": "Hk7It",
+          "x": 24,
+          "y": 20,
+          "name": "title",
+          "fill": "#0f172a",
+          "content": "Slide AI Editor",
+          "fontFamily": "Inter",
+          "fontSize": 32,
+          "fontWeight": "600"
+        },
+        {
+          "type": "frame",
+          "id": "tVQeI",
+          "x": 752,
+          "y": 16,
+          "name": "aBtn1",
+          "width": 128,
+          "height": 40,
+          "fill": "#e2e8f0",
+          "cornerRadius": 10,
+          "layout": "none",
+          "children": [
+            {
+              "type": "text",
+              "id": "8rqXY",
+              "x": 0,
+              "y": 0,
+              "fill": "#0f172a",
+              "textGrowth": "fixed-width-height",
+              "width": 128,
+              "height": 40,
+              "content": "파일 업로드",
+              "textAlign": "center",
+              "textAlignVertical": "middle",
+              "fontFamily": "Inter",
+              "fontSize": 16,
+              "fontWeight": "500"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "StVne",
+          "x": 888,
+          "y": 16,
+          "name": "aBtn2",
+          "width": 116,
+          "height": 40,
+          "fill": "#e2e8f0",
+          "cornerRadius": 10,
+          "layout": "none",
+          "children": [
+            {
+              "type": "text",
+              "id": "G3TuJ",
+              "x": 0,
+              "y": 0,
+              "fill": "#0f172a",
+              "textGrowth": "fixed-width-height",
+              "width": 116,
+              "height": 40,
+              "content": "이미지 추가",
+              "textAlign": "center",
+              "textAlignVertical": "middle",
+              "fontFamily": "Inter",
+              "fontSize": 16,
+              "fontWeight": "500"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "Typn0",
+          "x": 1012,
+          "y": 16,
+          "name": "aBtn3",
+          "width": 112,
+          "height": 40,
+          "fill": "#e2e8f0",
+          "cornerRadius": 10,
+          "layout": "none",
+          "children": [
+            {
+              "type": "text",
+              "id": "SdSMT",
+              "x": 0,
+              "y": 0,
+              "fill": "#0f172a",
+              "textGrowth": "fixed-width-height",
+              "width": 112,
+              "height": 40,
+              "content": "텍스트 제거",
+              "textAlign": "center",
+              "textAlignVertical": "middle",
+              "fontFamily": "Inter",
+              "fontSize": 16,
+              "fontWeight": "500"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "SNvKt",
+          "x": 1266,
+          "y": 16,
+          "name": "aBtn5",
+          "width": 128,
+          "height": 40,
+          "fill": "#3b82f6",
+          "cornerRadius": 10,
+          "layout": "none",
+          "children": [
+            {
+              "type": "text",
+              "id": "1rDvl",
+              "x": 0,
+              "y": 0,
+              "fill": "#ffffff",
+              "textGrowth": "fixed-width-height",
+              "width": 128,
+              "height": 40,
+              "content": "PDF 다운로드",
+              "textAlign": "center",
+              "textAlignVertical": "middle",
+              "fontFamily": "Inter",
+              "fontSize": 16,
+              "fontWeight": "600"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "veyjk",
+          "x": 1132,
+          "y": 16,
+          "name": "aBtn4",
+          "width": 126,
+          "height": 40,
+          "fill": "#dbeafe",
+          "cornerRadius": 10,
+          "layout": "none",
+          "children": [
+            {
+              "type": "text",
+              "id": "9wDJA",
+              "x": 0,
+              "y": 0,
+              "fill": "#1d4ed8",
+              "textGrowth": "fixed-width-height",
+              "width": 126,
+              "height": 40,
+              "content": "PPT 다운로드",
+              "textAlign": "center",
+              "textAlignVertical": "middle",
+              "fontFamily": "Inter",
+              "fontSize": 16,
+              "fontWeight": "600"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "zUYgn",
+          "x": 20,
+          "y": 94,
+          "name": "leftTitle",
+          "fill": "#64748b",
+          "content": "슬라이드",
+          "fontFamily": "Inter",
+          "fontSize": 15,
+          "fontWeight": "600"
+        },
+        {
+          "type": "text",
+          "id": "mh3wl",
+          "x": 1160,
+          "y": 100,
+          "name": "sidebarTitle",
+          "fill": "#0f172a",
+          "content": "텍스트 교체",
+          "fontFamily": "Inter",
+          "fontSize": 18,
+          "fontWeight": "600"
+        },
+        {
+          "type": "text",
+          "id": "fEp7Q",
+          "x": 574,
+          "y": 468,
+          "name": "canvasHint",
+          "fill": "#64748b",
+          "content": "캔버스 미리보기 영역",
+          "fontFamily": "Inter",
+          "fontSize": 24,
+          "fontWeight": "500"
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 8,
+          "id": "PzZS1",
+          "x": 20,
+          "y": 128,
+          "name": "thumb1",
+          "fill": "#f8fafc",
+          "width": 168,
+          "height": 102
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 8,
+          "id": "cj2PP",
+          "x": 20,
+          "y": 244,
+          "name": "thumb2",
+          "fill": "#f8fafc",
+          "width": 168,
+          "height": 102
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 8,
+          "id": "k3Wy7",
+          "x": 20,
+          "y": 360,
+          "name": "thumb3",
+          "fill": "#f8fafc",
+          "width": 168,
+          "height": 102
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 8,
+          "id": "ngmnP",
+          "x": 204,
+          "y": 86,
+          "name": "undoBtn",
+          "fill": "#f8fafc",
+          "width": 32,
+          "height": 32
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 8,
+          "id": "wV4Vf",
+          "x": 204,
+          "y": 126,
+          "name": "redoBtn",
+          "fill": "#f8fafc",
+          "width": 32,
+          "height": 32
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 8,
+          "id": "QzQfa",
+          "x": 204,
+          "y": 182,
+          "name": "clearBtn",
+          "fill": "#e2e8f0",
+          "width": 32,
+          "height": 32
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 10,
+          "id": "8tNqw",
+          "x": 1160,
+          "y": 142,
+          "name": "panelBox1",
+          "fill": "#f8fafc",
+          "width": 256,
+          "height": 92
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 10,
+          "id": "CGEmS",
+          "x": 1160,
+          "y": 246,
+          "name": "panelBox2",
+          "fill": "#f8fafc",
+          "width": 256,
+          "height": 56
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 10,
+          "id": "NZC4c",
+          "x": 1160,
+          "y": 314,
+          "name": "panelBox3",
+          "fill": "#f8fafc",
+          "width": 256,
+          "height": 56
+        },
+        {
+          "type": "frame",
+          "id": "xYhEG",
+          "x": 1160,
+          "y": 798,
+          "name": "aBtn6",
+          "width": 256,
+          "height": 44,
+          "fill": "#3b82f6",
+          "cornerRadius": 10,
+          "layout": "none",
+          "children": [
+            {
+              "type": "text",
+              "id": "tIDLz",
+              "x": 0,
+              "y": 0,
+              "fill": "#ffffff",
+              "textGrowth": "fixed-width-height",
+              "width": 256,
+              "height": 44,
+              "content": "텍스트 적용",
+              "textAlign": "center",
+              "textAlignVertical": "middle",
+              "fontFamily": "Inter",
+              "fontSize": 18,
+              "fontWeight": "600"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "0tOo5",
+          "x": 24,
+          "y": 868,
+          "fill": "#64748b",
+          "content": "APPLE HIG VARIANT",
+          "fontFamily": "Inter",
+          "fontSize": 12,
+          "fontWeight": "600"
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "BuzuL",
+      "x": 3120,
+      "y": 1520,
+      "name": "Variant 3 - Stripe",
+      "clip": true,
+      "width": 1440,
+      "height": 900,
+      "fill": "#f6f7fb",
+      "layout": "none",
+      "children": [
+        {
+          "type": "rectangle",
+          "id": "VvPbi",
+          "x": 0,
+          "y": 0,
+          "name": "Header",
+          "fill": "#ffffff",
+          "width": 1440,
+          "height": 68,
+          "stroke": {
+            "align": "inside",
+            "thickness": {
+              "bottom": 1
+            },
+            "fill": "#e5e7eb"
+          }
+        },
+        {
+          "type": "rectangle",
+          "id": "qiM43",
+          "x": 0,
+          "y": 68,
+          "name": "Slide Panel",
+          "fill": "#ffffff",
+          "width": 216,
+          "height": 832,
+          "stroke": {
+            "align": "inside",
+            "thickness": {
+              "right": 1
+            },
+            "fill": "#e5e7eb"
+          }
+        },
+        {
+          "type": "rectangle",
+          "id": "yg4rU",
+          "x": 216,
+          "y": 68,
+          "name": "Toolbar",
+          "fill": "#ffffff",
+          "width": 52,
+          "height": 832,
+          "stroke": {
+            "align": "inside",
+            "thickness": {
+              "right": 1
+            },
+            "fill": "#e5e7eb"
+          }
+        },
+        {
+          "type": "rectangle",
+          "id": "aKfXP",
+          "x": 268,
+          "y": 68,
+          "name": "Main Canvas",
+          "fill": "#eef2ff",
+          "width": 840,
+          "height": 832
+        },
+        {
+          "type": "rectangle",
+          "id": "YWPUZ",
+          "x": 1108,
+          "y": 68,
+          "name": "Sidebar",
+          "fill": "#ffffff",
+          "width": 332,
+          "height": 832,
+          "stroke": {
+            "align": "inside",
+            "thickness": {
+              "left": 1
+            },
+            "fill": "#e5e7eb"
+          }
+        },
+        {
+          "type": "text",
+          "id": "PdyHR",
+          "x": 24,
+          "y": 18,
+          "name": "title",
+          "fill": "#1f2937",
+          "content": "Slide AI Editor",
+          "fontFamily": "Inter",
+          "fontSize": 28,
+          "fontWeight": "600"
+        },
+        {
+          "type": "frame",
+          "id": "l0Yr3",
+          "x": 760,
+          "y": 15,
+          "name": "sBtn1",
+          "width": 126,
+          "height": 38,
+          "fill": "#eef0ff",
+          "cornerRadius": 10,
+          "layout": "none",
+          "children": [
+            {
+              "type": "text",
+              "id": "3ngjh",
+              "x": 0,
+              "y": 0,
+              "fill": "#1f2937",
+              "textGrowth": "fixed-width-height",
+              "width": 126,
+              "height": 38,
+              "content": "파일 업로드",
+              "textAlign": "center",
+              "textAlignVertical": "middle",
+              "fontFamily": "Inter",
+              "fontSize": 14,
+              "fontWeight": "500"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "f61tP",
+          "x": 894,
+          "y": 15,
+          "name": "sBtn2",
+          "width": 114,
+          "height": 38,
+          "fill": "#eef0ff",
+          "cornerRadius": 10,
+          "layout": "none",
+          "children": [
+            {
+              "type": "text",
+              "id": "BGgUG",
+              "x": 0,
+              "y": 0,
+              "fill": "#1f2937",
+              "textGrowth": "fixed-width-height",
+              "width": 114,
+              "height": 38,
+              "content": "이미지 추가",
+              "textAlign": "center",
+              "textAlignVertical": "middle",
+              "fontFamily": "Inter",
+              "fontSize": 14,
+              "fontWeight": "500"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "VAG75",
+          "x": 1016,
+          "y": 15,
+          "name": "sBtn3",
+          "width": 110,
+          "height": 38,
+          "fill": "#eef0ff",
+          "cornerRadius": 10,
+          "layout": "none",
+          "children": [
+            {
+              "type": "text",
+              "id": "hL1Pa",
+              "x": 0,
+              "y": 0,
+              "fill": "#1f2937",
+              "textGrowth": "fixed-width-height",
+              "width": 110,
+              "height": 38,
+              "content": "텍스트 제거",
+              "textAlign": "center",
+              "textAlignVertical": "middle",
+              "fontFamily": "Inter",
+              "fontSize": 14,
+              "fontWeight": "500"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "NMSPh",
+          "x": 1270,
+          "y": 15,
+          "name": "sBtn5",
+          "width": 128,
+          "height": 38,
+          "fill": "#635bff",
+          "cornerRadius": 12,
+          "layout": "none",
+          "children": [
+            {
+              "type": "text",
+              "id": "1cDyT",
+              "x": 0,
+              "y": 0,
+              "fill": "#ffffff",
+              "textGrowth": "fixed-width-height",
+              "width": 128,
+              "height": 38,
+              "content": "PDF 다운로드",
+              "textAlign": "center",
+              "textAlignVertical": "middle",
+              "fontFamily": "Inter",
+              "fontSize": 14,
+              "fontWeight": "600"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "iJbGv",
+          "x": 1134,
+          "y": 15,
+          "name": "sBtn4",
+          "width": 128,
+          "height": 38,
+          "fill": "#a78bfa",
+          "cornerRadius": 12,
+          "layout": "none",
+          "children": [
+            {
+              "type": "text",
+              "id": "fcLz7",
+              "x": 0,
+              "y": 0,
+              "fill": "#ffffff",
+              "textGrowth": "fixed-width-height",
+              "width": 128,
+              "height": 38,
+              "content": "PPT 다운로드",
+              "textAlign": "center",
+              "textAlignVertical": "middle",
+              "fontFamily": "Inter",
+              "fontSize": 14,
+              "fontWeight": "600"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "0F0HK",
+          "x": 24,
+          "y": 90,
+          "name": "leftTitle",
+          "fill": "#6b7280",
+          "content": "슬라이드",
+          "fontFamily": "Inter",
+          "fontSize": 13,
+          "fontWeight": "600"
+        },
+        {
+          "type": "text",
+          "id": "wEAvD",
+          "x": 1132,
+          "y": 98,
+          "name": "sidebarTitle",
+          "fill": "#1f2937",
+          "content": "텍스트 교체",
+          "fontFamily": "Inter",
+          "fontSize": 15,
+          "fontWeight": "600"
+        },
+        {
+          "type": "text",
+          "id": "qxmBe",
+          "x": 574,
+          "y": 468,
+          "name": "canvasHint",
+          "fill": "#667085",
+          "content": "캔버스 미리보기 영역",
+          "fontFamily": "Inter",
+          "fontSize": 22,
+          "fontWeight": "500"
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 12,
+          "id": "s2ynE",
+          "x": 24,
+          "y": 130,
+          "name": "thumb1",
+          "fill": "#f4f6ff",
+          "width": 176,
+          "height": 102
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 12,
+          "id": "80tuF",
+          "x": 24,
+          "y": 246,
+          "name": "thumb2",
+          "fill": "#f4f6ff",
+          "width": 176,
+          "height": 102
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 12,
+          "id": "ULOdr",
+          "x": 24,
+          "y": 362,
+          "name": "thumb3",
+          "fill": "#f4f6ff",
+          "width": 176,
+          "height": 102
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 8,
+          "id": "pkm8d",
+          "x": 204,
+          "y": 86,
+          "name": "undoBtn",
+          "fill": "#f7f8fc",
+          "width": 32,
+          "height": 32
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 8,
+          "id": "uwsaT",
+          "x": 204,
+          "y": 126,
+          "name": "redoBtn",
+          "fill": "#f7f8fc",
+          "width": 32,
+          "height": 32
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 8,
+          "id": "YNrzV",
+          "x": 204,
+          "y": 182,
+          "name": "clearBtn",
+          "fill": "#eef2ff",
+          "width": 32,
+          "height": 32
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 12,
+          "id": "VdIVR",
+          "x": 1132,
+          "y": 148,
+          "name": "panelBox1",
+          "fill": "#f7f8fc",
+          "width": 284,
+          "height": 92
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 12,
+          "id": "iLfC6",
+          "x": 1132,
+          "y": 250,
+          "name": "panelBox2",
+          "fill": "#f7f8fc",
+          "width": 284,
+          "height": 56
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 12,
+          "id": "JW0Ne",
+          "x": 1132,
+          "y": 324,
+          "name": "panelBox3",
+          "fill": "#f7f8fc",
+          "width": 284,
+          "height": 56
+        },
+        {
+          "type": "frame",
+          "id": "nsn2j",
+          "x": 1132,
+          "y": 800,
+          "name": "sBtn6",
+          "width": 284,
+          "height": 46,
+          "fill": "#635bff",
+          "cornerRadius": 12,
+          "layout": "none",
+          "children": [
+            {
+              "type": "text",
+              "id": "UfMUj",
+              "x": 0,
+              "y": 0,
+              "fill": "#ffffff",
+              "textGrowth": "fixed-width-height",
+              "width": 284,
+              "height": 46,
+              "content": "텍스트 적용",
+              "textAlign": "center",
+              "textAlignVertical": "middle",
+              "fontFamily": "Inter",
+              "fontSize": 15,
+              "fontWeight": "600"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "QGbVk",
+          "x": 24,
+          "y": 868,
+          "fill": "#635bff",
+          "content": "STRIPE VARIANT",
+          "fontFamily": "Inter",
+          "fontSize": 12,
+          "fontWeight": "600"
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "C2sSv",
+      "x": 4680,
+      "y": 1520,
+      "name": "Variant 4 - Linear Dark",
+      "clip": true,
+      "width": 1440,
+      "height": 900,
+      "fill": "#0D0F14",
+      "layout": "none",
+      "children": [
+        {
+          "type": "rectangle",
+          "id": "fmQGC",
+          "x": 0,
+          "y": 0,
+          "name": "Header",
+          "fill": "#11151d",
+          "width": 1440,
+          "height": 56,
+          "stroke": {
+            "align": "inside",
+            "thickness": {
+              "bottom": 1
+            },
+            "fill": "#1f2430"
+          }
+        },
+        {
+          "type": "rectangle",
+          "id": "y4dKs",
+          "x": 0,
+          "y": 56,
+          "name": "Slide Panel",
+          "fill": "#0f131a",
+          "width": 176,
+          "height": 844,
+          "stroke": {
+            "align": "inside",
+            "thickness": {
+              "right": 1
+            },
+            "fill": "#1f2430"
+          }
+        },
+        {
+          "type": "rectangle",
+          "id": "zHpAY",
+          "x": 176,
+          "y": 56,
+          "name": "Toolbar",
+          "fill": "#10141b",
+          "width": 48,
+          "height": 844,
+          "stroke": {
+            "align": "inside",
+            "thickness": {
+              "right": 1
+            },
+            "fill": "#1f2430"
+          }
+        },
+        {
+          "type": "rectangle",
+          "id": "v2A8R",
+          "x": 224,
+          "y": 56,
+          "name": "Main Canvas",
+          "fill": "#0b1017",
+          "width": 916,
+          "height": 844
+        },
+        {
+          "type": "rectangle",
+          "id": "l9VQ7",
+          "x": 1140,
+          "y": 56,
+          "name": "Sidebar",
+          "fill": "#0f131a",
+          "width": 300,
+          "height": 844,
+          "stroke": {
+            "align": "inside",
+            "thickness": {
+              "left": 1
+            },
+            "fill": "#1f2430"
+          }
+        },
+        {
+          "type": "text",
+          "id": "6n3Tf",
+          "x": 20,
+          "y": 16,
+          "name": "title",
+          "fill": "#d1d5db",
+          "content": "Slide AI Editor",
+          "fontFamily": "Inter",
+          "fontSize": 20,
+          "fontWeight": "600"
+        },
+        {
+          "type": "frame",
+          "id": "kipvT",
+          "x": 810,
+          "y": 12,
+          "name": "lBtn1",
+          "width": 126,
+          "height": 32,
+          "fill": "#1a1f2a",
+          "cornerRadius": 6,
+          "layout": "none",
+          "children": [
+            {
+              "type": "text",
+              "id": "RkJJs",
+              "x": 0,
+              "y": 0,
+              "fill": "#d1d5db",
+              "textGrowth": "fixed-width-height",
+              "width": 126,
+              "height": 32,
+              "content": "파일 업로드",
+              "textAlign": "center",
+              "textAlignVertical": "middle",
+              "fontFamily": "Inter",
+              "fontSize": 12,
+              "fontWeight": "500"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "2FWjZ",
+          "x": 944,
+          "y": 12,
+          "name": "lBtn2",
+          "width": 104,
+          "height": 32,
+          "fill": "#1a1f2a",
+          "cornerRadius": 6,
+          "layout": "none",
+          "children": [
+            {
+              "type": "text",
+              "id": "hjjEY",
+              "x": 0,
+              "y": 0,
+              "fill": "#d1d5db",
+              "textGrowth": "fixed-width-height",
+              "width": 104,
+              "height": 32,
+              "content": "이미지 추가",
+              "textAlign": "center",
+              "textAlignVertical": "middle",
+              "fontFamily": "Inter",
+              "fontSize": 12,
+              "fontWeight": "500"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "io6L1",
+          "x": 1056,
+          "y": 12,
+          "name": "lBtn3",
+          "width": 104,
+          "height": 32,
+          "fill": "#1a1f2a",
+          "cornerRadius": 6,
+          "layout": "none",
+          "children": [
+            {
+              "type": "text",
+              "id": "SacJS",
+              "x": 0,
+              "y": 0,
+              "fill": "#d1d5db",
+              "textGrowth": "fixed-width-height",
+              "width": 104,
+              "height": 32,
+              "content": "텍스트 제거",
+              "textAlign": "center",
+              "textAlignVertical": "middle",
+              "fontFamily": "Inter",
+              "fontSize": 12,
+              "fontWeight": "500"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "LXUWH",
+          "x": 1288,
+          "y": 12,
+          "name": "lBtn5",
+          "width": 112,
+          "height": 32,
+          "fill": "#5e6ad2",
+          "cornerRadius": 6,
+          "layout": "none",
+          "children": [
+            {
+              "type": "text",
+              "id": "YYgqN",
+              "x": 0,
+              "y": 0,
+              "fill": "#e5e7eb",
+              "textGrowth": "fixed-width-height",
+              "width": 112,
+              "height": 32,
+              "content": "PDF 다운로드",
+              "textAlign": "center",
+              "textAlignVertical": "middle",
+              "fontFamily": "Inter",
+              "fontSize": 12,
+              "fontWeight": "600"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "Gt1Y4",
+          "x": 1168,
+          "y": 12,
+          "name": "lBtn4",
+          "width": 112,
+          "height": 32,
+          "fill": "#1a1f2a",
+          "cornerRadius": 6,
+          "layout": "none",
+          "children": [
+            {
+              "type": "text",
+              "id": "lxtUS",
+              "x": 0,
+              "y": 0,
+              "fill": "#e5e7eb",
+              "textGrowth": "fixed-width-height",
+              "width": 112,
+              "height": 32,
+              "content": "PPT 다운로드",
+              "textAlign": "center",
+              "textAlignVertical": "middle",
+              "fontFamily": "Inter",
+              "fontSize": 12,
+              "fontWeight": "600"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "jMlKx",
+          "x": 12,
+          "y": 74,
+          "name": "leftTitle",
+          "fill": "#9ca3af",
+          "content": "슬라이드",
+          "fontFamily": "Inter",
+          "fontSize": 12,
+          "fontWeight": "600"
+        },
+        {
+          "type": "text",
+          "id": "GPqcd",
+          "x": 1156,
+          "y": 82,
+          "name": "sidebarTitle",
+          "fill": "#d1d5db",
+          "content": "텍스트 교체",
+          "fontFamily": "Inter",
+          "fontSize": 14,
+          "fontWeight": "600"
+        },
+        {
+          "type": "text",
+          "id": "CYBhi",
+          "x": 574,
+          "y": 468,
+          "name": "canvasHint",
+          "fill": "#6b7280",
+          "content": "캔버스 미리보기 영역",
+          "fontFamily": "Inter",
+          "fontSize": 16,
+          "fontWeight": "500"
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 6,
+          "id": "GxnLP",
+          "x": 12,
+          "y": 102,
+          "name": "thumb1",
+          "fill": "#151923",
+          "width": 152,
+          "height": 102
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 6,
+          "id": "aQDm2",
+          "x": 12,
+          "y": 214,
+          "name": "thumb2",
+          "fill": "#151923",
+          "width": 152,
+          "height": 102
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 6,
+          "id": "d3tov",
+          "x": 12,
+          "y": 326,
+          "name": "thumb3",
+          "fill": "#151923",
+          "width": 152,
+          "height": 102
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 8,
+          "id": "DLGdT",
+          "x": 204,
+          "y": 86,
+          "name": "undoBtn",
+          "fill": "#0d0f14",
+          "width": 32,
+          "height": 32
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 8,
+          "id": "uwq7p",
+          "x": 204,
+          "y": 126,
+          "name": "redoBtn",
+          "fill": "#0d0f14",
+          "width": 32,
+          "height": 32
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 8,
+          "id": "9GziL",
+          "x": 204,
+          "y": 182,
+          "name": "clearBtn",
+          "fill": "#1e2230",
+          "width": 32,
+          "height": 32
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 6,
+          "id": "PGfB4",
+          "x": 1156,
+          "y": 122,
+          "name": "panelBox1",
+          "fill": "#0d0f14",
+          "width": 268,
+          "height": 92
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 6,
+          "id": "1u22L",
+          "x": 1156,
+          "y": 218,
+          "name": "panelBox2",
+          "fill": "#0d0f14",
+          "width": 268,
+          "height": 56
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 6,
+          "id": "vhEPZ",
+          "x": 1156,
+          "y": 286,
+          "name": "panelBox3",
+          "fill": "#0d0f14",
+          "width": 268,
+          "height": 56
+        },
+        {
+          "type": "frame",
+          "id": "SfpBk",
+          "x": 1156,
+          "y": 812,
+          "name": "lBtn6",
+          "width": 268,
+          "height": 36,
+          "fill": "#5e6ad2",
+          "cornerRadius": 6,
+          "layout": "none",
+          "children": [
+            {
+              "type": "text",
+              "id": "vF023",
+              "x": 0,
+              "y": 0,
+              "fill": "#e5e7eb",
+              "textGrowth": "fixed-width-height",
+              "width": 268,
+              "height": 36,
+              "content": "텍스트 적용",
+              "textAlign": "center",
+              "textAlignVertical": "middle",
+              "fontFamily": "Inter",
+              "fontSize": 14,
+              "fontWeight": "600"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "zsiY1",
+          "x": 24,
+          "y": 868,
+          "fill": "#9ca3af",
+          "content": "LINEAR VARIANT",
+          "fontFamily": "Inter",
+          "fontSize": 12,
+          "fontWeight": "600"
+        }
+      ]
+    }
+  ]
+}
